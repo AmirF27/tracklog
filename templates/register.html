@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Tracklog: Register
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('register') }}" method="post">
+    	<div class="form-group">
+    		<input class="form-control" type="text" name="username" placeholder="Username" required>
+    	</div>
+    	<div class="form-group">
+    		<input class="form-control" type="email" name="email" placeholder="Email address" required>
+    	</div>
+    	<div class="form-group">
+    		<input class="form-control" type="password" name="password" placeholder="Password" required>
+    	</div>
+    	<div class="form-group">
+    		<input class="form-control" type="password" name="confirm" placeholder="Confirm password" required>
+    	</div>
+    	<div class="form-group">
+    		<button class="btn btn-default" type="submit">Register</button>
+    	</div>
+    </form>
+{% endblock %}
