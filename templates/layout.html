@@ -35,7 +35,7 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="{{ url_for('register') }}"><i class="fa fa-user-plus" aria-hidden="true"></i> Register</a></li>
-                        <li><a href="#"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a></li>
+                        <li><a href="{{ url_for('login') }}"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a></li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
 
@@ -48,8 +48,8 @@
             </div>
         </main>
 
-        <script src="../static/js/jquery-3.1.1.min.js"></script>
-        <script src="../static/js/bootstrap.min.js"></script>
+        <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
     </body>
 

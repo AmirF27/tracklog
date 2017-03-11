@@ -17,3 +17,8 @@ class User(Base):
 
     def __repr__(self):
         return '<User %r>' % (self.username)
+
+    # def is_authenticated():
+    # 	"""
+    # 	Returns True if user has provided valid credentials, otherwise False
+    # 	"""
