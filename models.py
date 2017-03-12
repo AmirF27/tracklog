@@ -1,9 +1,10 @@
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/
 
 from sqlalchemy import Column, Integer, String
+from flask_login import UserMixin
 from database import Base
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
@@ -17,8 +18,3 @@ class User(Base):
 
     def __repr__(self):
         return '<User %r>' % (self.username)
-
-    # def is_authenticated():
-    # 	"""
-    # 	Returns True if user has provided valid credentials, otherwise False
-    # 	"""
