@@ -1,10 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+import os
+import unirest
+
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user
 from sqlalchemy import func
 from passlib.apps import custom_app_context as pwd_context
 from models import User
 from database import db_session
 from helpers import *
+from flask_jsglue import JSGlue
 
 app = Flask(__name__)
 app.secret_key = 'some_secret'
@@ -13,8 +17,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.session_protection = "strong"
 
+JSGlue(app)
+
 @app.route("/")
-@login_required
 def index():
     return render_template("index.html")
 
@@ -47,18 +52,17 @@ def login():
         # https://flask-login.readthedocs.io/en/latest/
         login_user(user, remember=remember)
 
-        next = request.args.get('next')
+        next = request.args.get("next")
 
         if not is_safe_url(next):
             return abort(400)
 
-        return redirect(next or url_for('index'))
-
-        return redirect(url_for("index"))
+        return redirect(next or url_for("index"))
     else:
         return render_template("login.html")
 
 @app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for("index"))
@@ -82,9 +86,60 @@ def register():
         db_session.add(user)
         db_session.commit();
 
+        login_user(user, remember=False)
+
         return redirect(url_for("index"))
     else:
         return render_template("register.html")
+
+@app.route("/backlog")
+@login_required
+def backlog():
+
+    key = os.environ.get("API_KEY")
+
+    if not key:
+        raise RuntimeError("API_KEY not set")
+
+    # https://market.mashape.com/igdbcom/internet-game-database
+    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/1942?fields=*",
+        headers={
+            "X-Mashape-Key": key,
+            "Accept": "application/json"
+        }
+    )
+
+    return render_template("backlog.html", games=response.body)
+
+@app.route("/search")
+def search():
+
+    q = request.args.get("q")
+
+    if not q:
+        raise RuntimeError("missing parameter: q")
+
+    key = os.environ.get("API_KEY")
+
+    if not key:
+        raise RuntimeError("API_KEY not set")
+
+    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=name%2Ccover&search=" + q,
+        headers={
+            "X-Mashape-Key": key,
+            "Accept": "application/json"
+        }
+    )
+
+    results = [];
+
+    for game in response.body:
+        if (q.lower()) in game.get("name").lower():
+            results.append(game)
+
+    results = results[:10]
+
+    return jsonify(results)
 
 @login_manager.user_loader
 def load_user(user_id):
