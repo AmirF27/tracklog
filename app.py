@@ -124,22 +124,41 @@ def search():
     if not key:
         raise RuntimeError("API_KEY not set")
 
-    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=name%2Ccover&search=" + q,
+    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=name%2Ccover&limit=10&search=" + q,
         headers={
             "X-Mashape-Key": key,
             "Accept": "application/json"
         }
     )
 
-    results = [];
+    return jsonify(response.body)
 
-    for game in response.body:
-        if (q.lower()) in game.get("name").lower():
-            results.append(game)
+@app.route("/platforms")
+def platforms():
 
-    results = results[:10]
+    id = request.args.get("id")
 
-    return jsonify(results)
+    if not id:
+        raise RuntimeError("missing parameter: id")
+
+    key = os.environ.get("API_KEY")
+
+    if not key:
+        raise RuntimeError("API_KEY not set")
+
+    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/{}?fields=release_dates.platform".format(id),
+        headers={
+            "X-Mashape-Key": key,
+            "Accept": "application/json"
+        }
+    )
+
+    platforms = [];
+
+    for release_date in response.body[0].get("release_dates"):
+        platforms.append(release_date.get("platform"));
+
+    return jsonify(platforms)
 
 @login_manager.user_loader
 def load_user(user_id):

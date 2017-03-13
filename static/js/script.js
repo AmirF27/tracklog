@@ -3,11 +3,11 @@ var xhrPool = [];
 
 $(function() {
     $("#game-search").on("input", function() {
-        if ($(this).val()) {
+        if (this.value) {
             search($(this).val());
         }
         else {
-            $(".search-results").remove();
+            $(".game-results").html("");
             xhrPool.forEach(function(xhr) {
                 xhr.abort();
             });
@@ -40,6 +40,8 @@ function search(query) {
                 id: $(this).data("game-id"),
                 name: $("span", this).text()
             });
+
+            setPlatforms($(this).data("game-id"));
         });
     });
 
@@ -55,7 +57,7 @@ function setGameSelection(game) {
     $("#game-search").val("").hide();
     $(".game-panel").show();
     $(".game-panel .panel-body").html(game.name + removeIcon).attr("data-game-id", game.id);
-    $(".search-results").remove();
+    $(".game-results").html("");
 
     $(".game-panel .panel-body .fa-times").on("click", function() {
         clearGameSelection();
@@ -65,4 +67,18 @@ function setGameSelection(game) {
 function clearGameSelection() {
     $(".game-panel").hide();
     $("#game-search").show().focus();
+}
+
+function setPlatforms(id) {
+    $.getJSON(Flask.url_for("platforms"), { id: id }, function(data) {
+        var platforms = [];
+        console.log(data);
+        data.forEach(function(platform) {
+            platforms.push(
+                "<option>" + platform + "</option>");
+            console.log(platform);
+        });
+
+        $("select").append(platforms.join(""));
+    });
 }
