@@ -1,32 +1,30 @@
 var removeIcon = " <i class='fa fa-times' aria-hidden='true'></i>";
-var xhrPool = [];
+var xhr = null;
+var timer;
 
 $(function() {
     $("#game-search").on("input", function() {
         if (this.value) {
-            search($(this).val());
+            // credit for timeout idea to following StackOverflow answer:
+            // http://stackoverflow.com/a/13209287
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                search($("#game-search").val());
+            }, 300);
         }
         else {
             $(".game-results").html("");
-            xhrPool.forEach(function(xhr) {
-                xhr.abort();
-            });
-            xhrPool = [];
+            if (xhr != null) xhr.abort();
         }
     });
 });
 
-results = [];
-
 function search(query) {
     // http://www.ajaxload.info/
     $(".game-results").html("<img src='/static/img/ajax-loader.gif'>");
-    xhrPool.forEach(function(xhr) {
-        xhr.abort();
-    });
-    xhrPool = [];
+
     xhr = $.getJSON(Flask.url_for("search"), { q: query }, function(data) {
-        results = [];
+        var results = [];
         data.forEach(function(game) {
             var item = "<li class='list-group-item' data-game-id='" + game.id + "'>";
             var img = {};
@@ -59,15 +57,10 @@ function search(query) {
             setPlatforms($(this).data("game-id"));
         });
     });
-
-    xhrPool.push(xhr);
 }
 
 function setGameSelection(game) {
-    xhrPool.forEach(function(xhr) {
-        xhr.abort();
-    });
-    xhrPool = [];
+    if (xhr != null) xhr.abort();
 
     $("#game-search").val("").hide();
     $(".game-panel").show();
