@@ -16,17 +16,32 @@ $(function() {
     });
 });
 
+results = [];
+
 function search(query) {
     // http://www.ajaxload.info/
     $(".game-results").html("<img src='/static/img/ajax-loader.gif'>");
+    xhrPool.forEach(function(xhr) {
+        xhr.abort();
+    });
+    xhrPool = [];
     xhr = $.getJSON(Flask.url_for("search"), { q: query }, function(data) {
-        var results = [];
+        results = [];
         data.forEach(function(game) {
-            results.push(
-                "<li class='list-group-item' data-game-id='" + game.id + "'>" + 
-                "<img src='" + game.cover.url + "' alt='" + game.name + "'>" + 
-                "<span>" + game.name + "</span>" + 
-                "</li>");
+            var item = "<li class='list-group-item' data-game-id='" + game.id + "'>";
+            var img = {};
+            if (game.cover) {
+                // item += "<img src='" + game.cover.url + "' alt='" + game.name + "'>";
+                img.src = game.cover.url;
+                img.alt = game.name;
+            }
+            else {
+                img.src = "https://placeholdit.imgix.net/~text?txtsize=22&txt=Missing%20cover&w=90&h=90";
+                img.alt = "Missing cover";
+            }
+            item += "<img src='" + img.src + "' alt='" + img.alt + "'>";
+            item += "<span>" + game.name + "</span></li>";
+            results.push(item);
         });
         $(".game-results").html(
             $("<ul/>", {
@@ -70,6 +85,8 @@ function clearGameSelection() {
 }
 
 function setPlatforms(id) {
+    $("#platform-select").hide();
+    $(".platform-loading").show();
     $.getJSON(Flask.url_for("platforms"), { id: id }, function(data) {
         var platforms = [];
         console.log(data);
@@ -80,5 +97,8 @@ function setPlatforms(id) {
         });
 
         $("select").append(platforms.join(""));
+
+        $(".platform-loading").hide();
+        $("#platform-select").show();
     });
 }

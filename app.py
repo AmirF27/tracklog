@@ -1,5 +1,7 @@
 import os
 import unirest
+import urllib2
+import urllib
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user
@@ -96,20 +98,20 @@ def register():
 @login_required
 def backlog():
 
-    key = os.environ.get("API_KEY")
+    # key = os.environ.get("API_KEY")
 
-    if not key:
-        raise RuntimeError("API_KEY not set")
+    # if not key:
+    #     raise RuntimeError("API_KEY not set")
 
-    # https://market.mashape.com/igdbcom/internet-game-database
-    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/1942?fields=*",
-        headers={
-            "X-Mashape-Key": key,
-            "Accept": "application/json"
-        }
-    )
+    # # https://market.mashape.com/igdbcom/internet-game-database
+    # response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/1942?fields=*",
+    #     headers={
+    #         "X-Mashape-Key": key,
+    #         "Accept": "application/json"
+    #     }
+    # )
 
-    return render_template("backlog.html", games=response.body)
+    return render_template("backlog.html")
 
 @app.route("/search")
 def search():
@@ -119,19 +121,25 @@ def search():
     if not q:
         raise RuntimeError("missing parameter: q")
 
-    key = os.environ.get("API_KEY")
+    api_key = os.environ.get("API_KEY")
 
-    if not key:
+    if not api_key:
         raise RuntimeError("API_KEY not set")
 
-    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=name%2Ccover&limit=10&search=" + q,
-        headers={
-            "X-Mashape-Key": key,
+    # http://unirest.io/python.html
+    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/",
+        headers={ 
+            "X-Mashape-Key": api_key,
             "Accept": "application/json"
+        }, 
+        params={ 
+            "fields": "name,cover",
+            "limit": 10,
+            "search": q
         }
-    )
+    ).body
 
-    return jsonify(response.body)
+    return jsonify(response)
 
 @app.route("/platforms")
 def platforms():
@@ -153,12 +161,25 @@ def platforms():
         }
     )
 
-    platforms = [];
+    # platforms = [];
 
-    for release_date in response.body[0].get("release_dates"):
-        platforms.append(release_date.get("platform"));
+    # for release_date in response.body[0].get("release_dates"):
+    #     platform = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/platforms/{}?fields=name".format(release_date.get("platform")),
+    #         headers={
+    #             "X-Mashape-Key": key,
+    #             "Accept": "application/json"
+    #         }
+    #     )
+    #     platforms.append(platform.body[0].get("name"));
 
-    return jsonify(platforms)
+    platforms = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/platforms/?fields=name&limit=100",
+        headers={
+            "X-Mashape-Key": key,
+            "Accept": "application/json"
+        }
+    )
+
+    return jsonify(platforms.body)
 
 @login_manager.user_loader
 def load_user(user_id):
