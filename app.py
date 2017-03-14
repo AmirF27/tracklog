@@ -4,10 +4,10 @@ import urllib2
 import urllib
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from flask_login import LoginManager, login_user, logout_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 from sqlalchemy import func
 from passlib.apps import custom_app_context as pwd_context
-from models import User
+from models import *
 from database import db_session
 from helpers import *
 from flask_jsglue import JSGlue
@@ -98,20 +98,10 @@ def register():
 @login_required
 def backlog():
 
-    # key = os.environ.get("API_KEY")
+    backlog = db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id)
+    platforms = db_session.query(Platform.name).join(UserPlatform).filter(UserPlatform.user_id == current_user.id)
 
-    # if not key:
-    #     raise RuntimeError("API_KEY not set")
-
-    # # https://market.mashape.com/igdbcom/internet-game-database
-    # response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/1942?fields=*",
-    #     headers={
-    #         "X-Mashape-Key": key,
-    #         "Accept": "application/json"
-    #     }
-    # )
-
-    return render_template("backlog.html")
+    return render_template("backlog.html", entries=backlog, platforms=platforms)
 
 @app.route("/search")
 def search():

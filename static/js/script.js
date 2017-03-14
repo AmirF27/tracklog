@@ -58,7 +58,7 @@ function search(query) {
                 name: $("span", this).text()
             });
 
-            setPlatforms($(this).data("game-id"));
+            // setPlatforms($(this).data("game-id"));
         });
     });
 }
@@ -83,8 +83,8 @@ function clearGameSelection() {
 }
 
 function setPlatforms(id) {
-    $("#platform-select").hide();
-    $(".platform-loading").show();
+    // $("#platform-select").hide();
+    // $(".platform-loading").show();
     $.getJSON(Flask.url_for("platforms"), { id: id }, function(data) {
         var platforms = [];
         console.log(data);

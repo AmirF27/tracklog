@@ -5,7 +5,15 @@
 {% endblock %}
 
 {% block main %}
-    <form class="form-inline" action="" method="post">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-success" role="alert">
+                {{ messages | join(" ") }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form class="form-inline" action="{{ url_for('backlog') }}" method="post">
         <div class="form-group">
             <input class="form-control" id="game-search" type="text" name="game_name" placeholder="Game name" required>
         </div>
@@ -17,6 +25,11 @@
         <div class="form-group" id="platform-select">
             <select class="form-control" required>
                 <option>Platform</option>
+                {% if platforms %}
+                    {% for platform in platforms %}
+                        <option>{{ platform.name }}</option>
+                    {% endfor %}
+                {% endif %}
             </select>
         </div>
         <div class="form-group">
@@ -24,12 +37,12 @@
         </div>
     </form>
     <div class="game-results"></div>
-    {% if games %}
+    {% if entries %}
         <ul class="list-group">
-        {% for game in games %}
-            <li class="list-group-item" data-game-id="{{ game.id }}">
-                <img class="img-responsive" src="{{ game.cover.url }}" alt="{{ game.name }}">
-                {{ game.name }}
+        {% for entry in entries %}
+            <li class="list-group-item" data-game-id="{{ entry.igdb_id }}">
+                <img class="img-responsive" src="{{ entry.image_url }}" alt="{{ entry.game }}">
+                {{ entry.game }}
             </li>
         {% endfor %}
         </ul>
