@@ -1,21 +1,26 @@
 var removeIcon = " <i class='fa fa-times' aria-hidden='true'></i>";
-var xhr = null;
 var timer;
+var searchInput;
+var resultList;
 
 $(function() {
-    $("#game-search").on("input", function() {
-        if (this.value) {
-            // credit for timeout idea to following StackOverflow answer:
-            // http://stackoverflow.com/a/13209287
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                search($("#game-search").val());
-            }, 300);
-        }
-        else {
-            $(".game-results").html("");
-            if (xhr != null) xhr.abort();
-        }
+    searchInput = $("#game-search");
+    resultList = $(".game-results");
+    
+    searchInput.on("keyup", function() {
+        // credit for timeout idea to following StackOverflow answer:
+        // http://stackoverflow.com/a/13209287
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            if (searchInput.val()) {
+                search(searchInput.val());
+                resultList.show();
+            }
+            else {
+                resultList.html("");
+                resultList.hide();
+            }
+        }, 300);
     });
 });
 
@@ -23,13 +28,12 @@ function search(query) {
     // http://www.ajaxload.info/
     $(".game-results").html("<img src='/static/img/ajax-loader.gif'>");
 
-    xhr = $.getJSON(Flask.url_for("search"), { q: query }, function(data) {
+    $.getJSON(Flask.url_for("search"), { q: query }, function(data) {
         var results = [];
         data.forEach(function(game) {
             var item = "<li class='list-group-item' data-game-id='" + game.id + "'>";
             var img = {};
             if (game.cover) {
-                // item += "<img src='" + game.cover.url + "' alt='" + game.name + "'>";
                 img.src = game.cover.url;
                 img.alt = game.name;
             }
@@ -60,7 +64,8 @@ function search(query) {
 }
 
 function setGameSelection(game) {
-    if (xhr != null) xhr.abort();
+    $(".game-results").html("");
+    $(".game-results").hide();
 
     $("#game-search").val("").hide();
     $(".game-panel").show();
