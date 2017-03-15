@@ -58,8 +58,6 @@ function search(query) {
                 name: $("span", this).text(),
                 img: $("img", this).attr("src")
             });
-
-            // setPlatforms($(this).data("game-id"));
         });
     });
 }
@@ -84,23 +82,4 @@ function clearGameSelection() {
     $("#game-search").val("").show().focus();
     $("input[name='igdb_id']").val("");
     $("input[name='image_url']").val("");
-}
-
-function setPlatforms(id) {
-    // $("#platform-select").hide();
-    // $(".platform-loading").show();
-    $.getJSON(Flask.url_for("platforms"), { id: id }, function(data) {
-        var platforms = [];
-        console.log(data);
-        data.forEach(function(platform) {
-            platforms.push(
-                "<option>" + platform + "</option>");
-            console.log(platform);
-        });
-
-        $("select").append(platforms.join(""));
-
-        $(".platform-loading").hide();
-        $("#platform-select").show();
-    });
 }

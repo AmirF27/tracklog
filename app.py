@@ -110,10 +110,16 @@ def backlog():
 
         platform_id = db_session.query(Platform.id).filter(Platform.name == platform).one().id
 
-        db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, "backlog"))
-        db_session.commit()
+        if not db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id). \
+                                           filter(ListEntry.game == game). \
+                                           filter(ListEntry.platform_id == platform_id):
+            db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, "backlog"))
+            db_session.commit()
+        else:
+            flash("{} is already in your backlog under {}.".format(game, platform), "danger")
+            return redirect(url_for("backlog"))
 
-        flash("{} successfully added to backlog under {}.".format(game, platform), "success")
+        flash("{} successfully added to your backlog under {}.".format(game, platform), "success")
         return redirect(url_for("backlog"))
     else:
         backlog = db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id).order_by(ListEntry.game)
@@ -148,6 +154,25 @@ def search():
     ).body
 
     return jsonify(response)
+
+@app.route("/delete", methods=["POST"])
+@login_required
+def delete():
+
+    id = request.form.get("id")
+
+    if not id:
+        raise RuntimeError("missing parameter: id")
+
+    info = db_session.query(ListEntry.game, Platform.name).join(Platform).filter(ListEntry.id == id).one()
+    info = { "game": info[0], "platform": info[1] }
+
+    db_session.query(ListEntry).filter(ListEntry.id == id).delete()
+    db_session.commit()
+
+    flash("{} under {} successfully deleted from your backlog.".format(info.get("game"), info.get("platform")), "success")
+
+    return redirect(url_for("backlog"))
 
 @app.route("/platforms")
 def platforms():
