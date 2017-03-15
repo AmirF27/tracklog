@@ -5,15 +5,17 @@
 {% endblock %}
 
 {% block main %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="alert alert-success" role="alert">
-                {{ messages | join(" ") }}
+    {% with message = get_flashed_messages(with_categories=True)[0] %}
+        {% if message %}
+            <div class="alert alert-{{ message[0] }}" role="alert">
+                {{ message[1] }}
             </div>
         {% endif %}
     {% endwith %}
 
     <form class="form-inline" action="{{ url_for('backlog') }}" method="post">
+        <input type="hidden" name="igdb_id">
+        <input type="hidden" name="image_url">
         <div class="form-group">
             <input class="form-control" id="game-search" type="text" name="game_name" placeholder="Game name" required>
         </div>
@@ -23,7 +25,7 @@
             </div>
         </div>
         <div class="form-group" id="platform-select">
-            <select class="form-control" required>
+            <select class="form-control" name="platform" required>
                 <option>Platform</option>
                 {% if platforms %}
                     {% for platform in platforms %}

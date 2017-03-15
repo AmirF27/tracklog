@@ -39,7 +39,7 @@ def login():
         user = db_session.query(User).filter(func.lower(User.username) == func.lower(username)).first()
 
         if not user:
-            flash("The username you've entered does not exist")
+            flash("The username you've entered does not exist.")
             return render_template("login.html")
 
         if not pwd_context.verify(password, user.password):
@@ -94,14 +94,32 @@ def register():
     else:
         return render_template("register.html")
 
-@app.route("/backlog")
+@app.route("/backlog", methods=["GET", "POST"])
 @login_required
 def backlog():
 
-    backlog = db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id)
-    platforms = db_session.query(Platform.name).join(UserPlatform).filter(UserPlatform.user_id == current_user.id)
+    if request.method == "POST":
+        platform = request.form.get("platform")
+        igdb_id = request.form.get("igdb_id")
+        game = request.form.get("game_name")
+        image_url = request.form.get("image_url")
 
-    return render_template("backlog.html", entries=backlog, platforms=platforms)
+        if not all([platform, igdb_id, game, image_url]) or platform == "Platform":
+            flash("Game and/or platform missing, couldn't add to backlog. Please try again.", "danger")
+            return redirect(url_for("backlog"))
+
+        platform_id = db_session.query(Platform.id).filter(Platform.name == platform).one().id
+
+        db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, "backlog"))
+        db_session.commit()
+
+        flash("{} successfully added to backlog under {}.".format(game, platform), "success")
+        return redirect(url_for("backlog"))
+    else:
+        backlog = db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id).order_by(ListEntry.game)
+        platforms = db_session.query(Platform.name).join(UserPlatform).filter(UserPlatform.user_id == current_user.id)
+
+        return render_template("backlog.html", entries=backlog, platforms=platforms)
 
 @app.route("/search")
 def search():

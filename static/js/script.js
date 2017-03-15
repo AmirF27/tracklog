@@ -6,8 +6,8 @@ var resultList;
 $(function() {
     searchInput = $("#game-search");
     resultList = $(".game-results");
-    
-    searchInput.on("keyup", function() {
+
+    searchInput.on("input", function() {
         // credit for timeout idea to following StackOverflow answer:
         // http://stackoverflow.com/a/13209287
         clearTimeout(timer);
@@ -20,7 +20,7 @@ $(function() {
                 resultList.html("");
                 resultList.hide();
             }
-        }, 300);
+        }, 400);
     });
 });
 
@@ -41,8 +41,8 @@ function search(query) {
                 img.src = "https://placeholdit.imgix.net/~text?txtsize=22&txt=Missing%20cover&w=90&h=90";
                 img.alt = "Missing cover";
             }
-            item += "<img src='" + img.src + "' alt='" + img.alt + "'>";
-            item += "<span>" + game.name + "</span></li>";
+            item += "<img src='" + img.src + "' alt='" + img.alt + "' style='height: 60px;'>";
+            item += " <span>" + game.name + "</span></li>";
             results.push(item);
         });
         $(".game-results").html(
@@ -55,7 +55,8 @@ function search(query) {
         $(".search-results li").on("click", function() {
             setGameSelection({
                 id: $(this).data("game-id"),
-                name: $("span", this).text()
+                name: $("span", this).text(),
+                img: $("img", this).attr("src")
             });
 
             // setPlatforms($(this).data("game-id"));
@@ -67,10 +68,11 @@ function setGameSelection(game) {
     $(".game-results").html("");
     $(".game-results").hide();
 
-    $("#game-search").val("").hide();
+    $("#game-search").val(game.name).hide();
     $(".game-panel").show();
-    $(".game-panel .panel-body").html(game.name + removeIcon).attr("data-game-id", game.id);
-    $(".game-results").html("");
+    $(".game-panel .panel-body").html(game.name + removeIcon);
+    $("input[name='igdb_id']").val(game.id);
+    $("input[name='image_url']").val(game.img);
 
     $(".game-panel .panel-body .fa-times").on("click", function() {
         clearGameSelection();
@@ -79,7 +81,9 @@ function setGameSelection(game) {
 
 function clearGameSelection() {
     $(".game-panel").hide();
-    $("#game-search").show().focus();
+    $("#game-search").val("").show().focus();
+    $("input[name='igdb_id']").val("");
+    $("input[name='image_url']").val("");
 }
 
 function setPlatforms(id) {
