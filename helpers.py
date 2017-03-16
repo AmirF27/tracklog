@@ -7,8 +7,10 @@ from urlparse import urlparse, urljoin
 
 def login_required(f):
     """
+    Decorated function for pages that require login
     http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
     """
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated():
@@ -20,6 +22,7 @@ def is_safe_url(target):
     """
     http://flask.pocoo.org/snippets/62/
     """
+    
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and \

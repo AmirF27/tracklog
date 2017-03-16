@@ -17,7 +17,7 @@
         <input type="hidden" name="igdb_id">
         <input type="hidden" name="image_url">
         <div class="form-group">
-            <input class="form-control" id="game-search" type="text" name="game_name" placeholder="Game name" required>
+            <input class="form-control" type="text" name="game_name" placeholder="Game name" required>
         </div>
         <div class="form-group game-panel" style="display: none;">
             <div class="panel panel-default form-control" style="margin-bottom: 0;">
@@ -38,7 +38,7 @@
             <button class="btn btn-primary" type="submit">Add to backlog</button>
         </div>
     </form>
-    <div class="game-results"></div>
+    <div class="search-results"></div>
     {% if entries %}
         <ul class="list-group">
         {% for entry in entries %}
