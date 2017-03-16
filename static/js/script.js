@@ -58,7 +58,7 @@ function search(query) {
             });
         }
 
-        // display the results
+        // display the result-list
         $searchResults.html(results);
 
         // add a click listener to list items provided results were found
@@ -66,7 +66,7 @@ function search(query) {
             $(".result-list li").on("click", function() {
                 setGameSelection({
                     id: $(this).data("game-id"),
-                    name: $("span", this).text(),
+                    name: $(this).text(),
                     img: $("img", this).attr("src")
                 });
             });
@@ -78,11 +78,8 @@ function showLoadingIcon() {
     $searchResults.html($("<li/>", {
         class: "list-group-item",
         html: $("<img/>", {
-            src: "/static/img/ajax-loader.gif",
-            css: {
-                "display": "block",
-                "margin": "0 auto"
-            }
+            class: "loading",
+            src: "/static/img/ajax-loader.gif"
         })
     }));
 }
@@ -97,11 +94,8 @@ function createListItem(game) {
     // if no results were found, return a list item specifying as much
     if (game === undefined) {
         return $("<li/>", {
-            class: "list-group-item",
-            text: "No games were found matching your input.",
-            css: {
-                "text-align": "center"
-            }
+            class: "list-group-item empty-list",
+            text: "No games were found matching your input."
         });
     }
 
@@ -123,28 +117,15 @@ function createListItem(game) {
     img.alt = game.name;
 
     var wrapper = $("<div/>", {
-        css: {
-            "clear": "both",
-            "display": "inline-block",
-        }
+        class: "list-content-wrapper"
     });
 
     $("<img/>", {
         src: img.src,
-        alt: img.alt,
-        css: {
-            "float": "left",
-            "height": "60px",
-            "vertical-align": "middle"
-        }
+        alt: img.alt
     }).appendTo(wrapper);
 
-    $("<span/>", {
-        text: game.name,
-        css: {
-            "text-align": "center"
-        }
-    }).appendTo(wrapper);
+    wrapper.append(game.name);
 
     wrapper.appendTo(listItem);
 
@@ -159,7 +140,7 @@ function createListItem(game) {
  */
 function setGameSelection(game) {
     // clear the result list and hide it, since it's not needed anymore
-    $(".search-results").html("").hide();
+    $searchResults.html("").hide();
 
     // set the value of search textbox to the name of the selected game
     // and hide it, will be used later for form submission (but the user doesn't need to see it)

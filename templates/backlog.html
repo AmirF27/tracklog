@@ -16,13 +16,13 @@
         {% endif %}
     {% endwith %}
 
-    <form class="form-inline" action="{{ url_for('backlog') }}" method="post" style="margin-bottom: 8px;">
+    <form class="form-inline" action="{{ url_for('backlog') }}" method="post">
         <input type="hidden" name="igdb_id">
         <input type="hidden" name="image_url">
         <div class="form-group">
             <input class="form-control" type="text" name="game_name" placeholder="Game name" required>
-            <div class="panel panel-default form-control game-panel" style="margin-bottom: 0; display: none;">
-                <div class="panel-body" style="padding: 0;"></div>
+            <div class="panel panel-default form-control game-panel">
+                <div class="panel-body"></div>
             </div>
         </div>
         <div class="form-group">
@@ -40,21 +40,21 @@
         </div>
     </form>
     <div class="row">
-        <div class="col-sm-4">
-            <ul class="list-group result-list" style="display: hidden;"></ul>
+        <div class="col-sm-6 col-md-4">
+            <ul class="list-group result-list"></ul>
         </div>
     </div>
     {% if entries %}
         <ul class="list-group">
         {% for entry in entries %}
             <li class="list-group-item" data-game-id="{{ entry.igdb_id }}" data-entry-id="{{ entry.id }}">
+                <div class="list-content-wrapper">
                 <img src="{{ entry.image_url }}" alt="{{ entry.game }}">
-                <div style="display: inline-block">
                     {{ entry.game }}
                     <form action="{{ url_for('delete') }}" method="post">
                         <input type="hidden" name="id" value="{{ entry.id }}">
                         <button type="submit" class="btn btn-default">
-                            <i class="fa fa-trash" aria-hidden="true" style="display: block; color: crimson; font-size: 20px;"></i>
+                            <i class="fa fa-trash" aria-hidden="true"></i>
                         </button>
                     </form>
                 </div>

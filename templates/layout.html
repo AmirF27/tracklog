@@ -9,6 +9,7 @@
 
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 
         <title>{% block title %}{% endblock %}</title>
 
@@ -47,7 +48,7 @@
             </div><!-- /.container-fluid -->
         </nav>
 
-        <main style="margin-top: 60px;">
+        <main>
             <div class="container">
                 {% block main %}{% endblock %}
             </div>
