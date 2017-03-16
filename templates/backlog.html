@@ -7,24 +7,25 @@
 {% block main %}
     {% with message = get_flashed_messages(with_categories=True)[0] %}
         {% if message %}
-            <div class="alert alert-{{ message[0] }}" role="alert">
+            <div class="alert alert-{{ message[0] }} aler-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 {{ message[1] }}
             </div>
         {% endif %}
     {% endwith %}
 
-    <form class="form-inline" action="{{ url_for('backlog') }}" method="post">
+    <form class="form-inline" action="{{ url_for('backlog') }}" method="post" style="margin-bottom: 8px;">
         <input type="hidden" name="igdb_id">
         <input type="hidden" name="image_url">
         <div class="form-group">
             <input class="form-control" type="text" name="game_name" placeholder="Game name" required>
-        </div>
-        <div class="form-group game-panel" style="display: none;">
-            <div class="panel panel-default form-control" style="margin-bottom: 0;">
+            <div class="panel panel-default form-control game-panel" style="margin-bottom: 0; display: none;">
                 <div class="panel-body" style="padding: 0;"></div>
             </div>
         </div>
-        <div class="form-group" id="platform-select">
+        <div class="form-group">
             <select class="form-control" name="platform" required>
                 <option>Platform</option>
                 {% if platforms %}
@@ -38,7 +39,11 @@
             <button class="btn btn-primary" type="submit">Add to backlog</button>
         </div>
     </form>
-    <div class="search-results"></div>
+    <div class="row">
+        <div class="col-sm-4">
+            <ul class="list-group result-list" style="display: hidden;"></ul>
+        </div>
+    </div>
     {% if entries %}
         <ul class="list-group">
         {% for entry in entries %}

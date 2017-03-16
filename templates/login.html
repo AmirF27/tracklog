@@ -8,7 +8,10 @@
     <!-- http://flask.pocoo.org/docs/0.12/patterns/flashing/ -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 {{ messages | join(" ") }}
             </div>
         {% endif %}

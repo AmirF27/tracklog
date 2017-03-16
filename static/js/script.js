@@ -1,31 +1,31 @@
 var removeIcon = " <i class='fa fa-times' aria-hidden='true'></i>";
 var timer;
-var searchInput;
-var searchResults;
+var $searchInput;
+var $searchResults;
 
 $(function() {
     // cache game search textbox and search results container div
-    searchInput = $("input[name='game_name']");
-    searchResults = $(".search-results");
+    $searchInput = $("input[name='game_name']");
+    $searchResults = $(".result-list");
 
     // add input listener to search texbox
-    searchInput.on("input", function() {
+    $searchInput.on("input", function() {
         // set timeout in order to throttle number of requests
         // timeout idea attributed to following StackOverflow answer:
         // http://stackoverflow.com/a/13209287
         clearTimeout(timer);
         timer = setTimeout(function() {
             // if search textbox is not empty
-            if (searchInput.val()) {
+            if ($searchInput.val()) {
                 // search for games matching input and show list
-                search(searchInput.val());
-                searchResults.show();
+                search($searchInput.val());
+                $searchResults.show();
             }
             // otherwise, if search textbox is empty
             else {
                 // clear the list and hide it
-                searchResults.html("");
-                searchResults.hide();
+                $searchResults.html("");
+                $searchResults.hide();
             }
         }, 400);
     });
@@ -40,35 +40,51 @@ $(function() {
 function search(query) {
     // display loading icon until the search is complete
     // http://www.ajaxload.info/
-    $(".search-results").html("<img src='/static/img/ajax-loader.gif'>");
+    showLoadingIcon();
 
     // send request to server for games matching user's input
     $.getJSON(Flask.url_for("search"), { q: query }, function(data) {
         // variable to hold list items for search results
         var results = [];
-        // for each result received from server,
+        // if no results were found, create a single list item displaying to the user as much
+        if (data.length === 0) {
+            results.push(createListItem(undefined));
+        }
+        // otherwise, for each result received from server,
         // create a list item and add it to results
-        data.forEach(function(game) {
-            results.push(createListItem(game));
-        });
-
-        // create the actual result list
-        $(".search-results").html(
-            $("<ul/>", {
-                class: "list-group result-list",
-                html: results
-            })
-        );
-
-        // add a click listener to list items
-        $(".search-results li").on("click", function() {
-            setGameSelection({
-                id: $(this).data("game-id"),
-                name: $("span", this).text(),
-                img: $("img", this).attr("src")
+        else {
+            data.forEach(function(game) {
+                results.push(createListItem(game));
             });
-        });
+        }
+
+        // display the results
+        $searchResults.html(results);
+
+        // add a click listener to list items provided results were found
+        if (data.length !== 0) {
+            $(".result-list li").on("click", function() {
+                setGameSelection({
+                    id: $(this).data("game-id"),
+                    name: $("span", this).text(),
+                    img: $("img", this).attr("src")
+                });
+            });
+        }
     });
+}
+
+function showLoadingIcon() {
+    $searchResults.html($("<li/>", {
+        class: "list-group-item",
+        html: $("<img/>", {
+            src: "/static/img/ajax-loader.gif",
+            css: {
+                "display": "block",
+                "margin": "0 auto"
+            }
+        })
+    }));
 }
 
 /**
@@ -78,12 +94,24 @@ function search(query) {
  * @return {Object} listItem - The created list item for game.
  */
 function createListItem(game) {
+    // if no results were found, return a list item specifying as much
+    if (game === undefined) {
+        return $("<li/>", {
+            class: "list-group-item",
+            text: "No games were found matching your input.",
+            css: {
+                "text-align": "center"
+            }
+        });
+    }
+
+    // create the list item
     var listItem = $("<li/>", {
-        "class": "list-group-item",
-        "data-game-id": game.id
+        class: "list-group-item",
+        "data-game-id": game.id,
     });
 
-    // some game covers were missing from API, so I had to check
+    // some game covers were missing from API, so had to check
     // if it's missing in order to display a placeholder instead
     var img = {};
     if (game.cover) {
@@ -94,14 +122,31 @@ function createListItem(game) {
     }
     img.alt = game.name;
 
+    var wrapper = $("<div/>", {
+        css: {
+            "clear": "both",
+            "display": "inline-block",
+        }
+    });
+
     $("<img/>", {
         src: img.src,
         alt: img.alt,
-    }).css("height", "60px").appendTo(listItem);
+        css: {
+            "float": "left",
+            "height": "60px",
+            "vertical-align": "middle"
+        }
+    }).appendTo(wrapper);
 
     $("<span/>", {
-        text: game.game_name
-    }).appendTo(listItem);
+        text: game.name,
+        css: {
+            "text-align": "center"
+        }
+    }).appendTo(wrapper);
+
+    wrapper.appendTo(listItem);
 
     return listItem;
 }
