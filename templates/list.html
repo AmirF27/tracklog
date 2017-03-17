@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Tracklog: {{ current_user.username }}'s backlog
+    Tracklog: {{ current_user.username }}'s {{ list_type }}
 {% endblock %}
 
 {% block main %}
@@ -16,7 +16,7 @@
         {% endif %}
     {% endwith %}
 
-    <form class="form-inline" action="{{ url_for('add', list_type='backlog') }}" method="post">
+    <form class="form-inline" action="{{ url_for('add', list_type=list_type) }}" method="post">
         <input type="hidden" name="igdb_id">
         <input type="hidden" name="image_url">
         <div class="form-group">
@@ -36,7 +36,7 @@
             </select>
         </div>
         <div class="form-group">
-            <button class="btn btn-primary" type="submit">Add to backlog</button>
+            <button class="btn btn-primary" type="submit">Add to {{ list_type }}</button>
         </div>
     </form>
     <div class="row list-container">
@@ -51,7 +51,7 @@
                 <div class="list-content-wrapper">
                 <img src="{{ entry.image_url }}" alt="{{ entry.game }}">
                     {{ entry.game }}
-                    <form action="{{ url_for('delete') }}" method="post">
+                    <form action="{{ url_for('delete', list_type=list_type) }}" method="post">
                         <input type="hidden" name="id" value="{{ entry.id }}">
                         <button type="submit" class="btn btn-default">
                             <i class="fa fa-trash" aria-hidden="true"></i>
@@ -61,5 +61,7 @@
             </li>
         {% endfor %}
         </ul>
+    {% else %}
+        <div class="alert alert-info empty-list">Your {{ list_type }} is currently empty.</div>
     {% endif %}
 {% endblock %}
