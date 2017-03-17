@@ -144,6 +144,7 @@ def lists(list_type):
     platforms = db_session.query(Platform.name). \
                            join(UserPlatform). \
                            filter(UserPlatform.user_id == current_user.id). \
+                           order_by(Platform.name). \
                            all()
 
     return render_template("list.html", list_type=list_type, entries=entries, platforms=platforms)
@@ -246,6 +247,21 @@ def delete(list_type):
     flash("{} under {} successfully deleted from your {}."
         .format(info.get("game"), info.get("platform"), list_type), "success")
     return redirect(url_for("lists", list_type=list_type))
+
+@app.route("/account-settings")
+@login_required
+def account_settings():
+
+    platforms = []
+
+    for platform in db_session.query(UserPlatform, Platform.name). \
+                           join(Platform). \
+                           filter(UserPlatform.user_id == current_user.id). \
+                           order_by(Platform.name). \
+                           all():
+        platforms.append(platform[1])
+
+    return render_template("account-settings.html", platforms=platforms)
 
 @login_manager.user_loader
 def load_user(user_id):

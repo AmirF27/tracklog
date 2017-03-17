@@ -36,11 +36,19 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right list-inline">
                         {% if current_user.is_authenticated() %}
-                            <li><a href="#">Hello, {{ current_user.username }}!</a></li>
-                            <li><a href="{{ url_for('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                            <li>
+                                <a href="{{ url_for('account_settings') }}"><i class="fa fa-cog" aria-hidden="true"></i> Account Settings</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
+                            </li>
                         {% else %}
-                            <li><a href="{{ url_for('register') }}"><i class="fa fa-user-plus" aria-hidden="true"></i> Register</a></li>
-                            <li><a href="{{ url_for('login') }}"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a></li>
+                            <li>
+                                <a href="{{ url_for('register') }}"><i class="fa fa-user-plus" aria-hidden="true"></i> Register</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('login') }}"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
+                            </li>
                         {% endif %}
                     </ul>
                 </div><!-- /.navbar-collapse -->

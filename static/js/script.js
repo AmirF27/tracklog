@@ -94,7 +94,7 @@ function createListItem(game) {
     // if no results were found, return a list item specifying as much
     if (game === undefined) {
         return $("<li/>", {
-            class: "list-group-item empty-list",
+            class: "list-group-item text-center",
             text: "No games were found matching your input."
         });
     }

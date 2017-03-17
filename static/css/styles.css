@@ -44,10 +44,6 @@ main {
         margin: 0 auto;
     }
 
-    .empty-list {
-        text-align: center;
-    }
-
     /* prevent search results from going off screen */
     .list-container {
         margin-right: 15px;

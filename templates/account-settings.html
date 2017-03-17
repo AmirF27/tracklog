@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block main %}
+    <div class="row">
+        <h2 class="text-center">Manage Platforms</h2>
+        <div class="col-sm-6">
+            <h3>My Platforms</h3>
+            {% if platforms %}
+                <ul class="list-group">
+                {% for platform in platforms %}
+                    <li class="list-group-item">{{ platform }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="alert alert-info text-center">You haven't added any platforms yet.</div>
+            {% endif %}
+        </div>
+        <div class="col-sm-6"></div>
+    </div>
+{% endblock %}
