@@ -101,7 +101,7 @@ function createListItem(game) {
 
     // create the list item
     var listItem = $("<li/>", {
-        class: "list-group-item",
+        class: "list-group-item result-item",
         "data-game-id": game.id,
     });
 

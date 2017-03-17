@@ -16,7 +16,7 @@
         {% endif %}
     {% endwith %}
 
-    <form class="form-inline" action="{{ url_for('backlog') }}" method="post">
+    <form class="form-inline" action="{{ url_for('add', list_type='backlog') }}" method="post">
         <input type="hidden" name="igdb_id">
         <input type="hidden" name="image_url">
         <div class="form-group">
@@ -39,8 +39,8 @@
             <button class="btn btn-primary" type="submit">Add to backlog</button>
         </div>
     </form>
-    <div class="row">
-        <div class="col-sm-6 col-md-4">
+    <div class="row list-container">
+        <div class="col-xs-12 col-sm-6 col-md-4">
             <ul class="list-group result-list"></ul>
         </div>
     </div>

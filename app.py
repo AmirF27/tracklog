@@ -129,49 +129,20 @@ def register():
     else:
         return render_template("register.html")
 
-@app.route("/backlog", methods=["GET", "POST"])
+@app.route("/lists/<string:list_type>")
 @login_required
-def backlog():
+def lists(list_type):
     """
     Route for displaying user backlog
-    TODO: move game adding functionality to separate route
     """
 
-    if request.method == "POST":
-        # retrieve form data
-        platform = request.form.get("platform")
-        igdb_id = request.form.get("igdb_id")
-        game = request.form.get("game_name")
-        image_url = request.form.get("image_url")
+    entries = db_session.query(ListEntry). \
+                         filter(ListEntry.user_id == current_user.id). \
+                         filter(ListEntry.list_type == list_type). \
+                         order_by(ListEntry.game)
+    platforms = db_session.query(Platform.name).join(UserPlatform).filter(UserPlatform.user_id == current_user.id)
 
-        # make sure none of the fields in the form were blank
-        if not all([platform, igdb_id, game, image_url]) or platform == "Platform":
-            flash("Game and/or platform missing, couldn't add to backlog. Please try again.", "danger")
-            return redirect(url_for("backlog"))
-
-        # get platform ID from database based on the value provided in the form
-        platform_id = db_session.query(Platform.id).filter(Platform.name == platform).one().id
-
-        # query the database and check if the entry the user is about to add
-        # already exists, in order to ensure the user doesn't add duplicates
-        if not db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id). \
-                                           filter(ListEntry.game == game). \
-                                           filter(ListEntry.platform_id == platform_id):
-            # if the entry doesn't exist in the database, insert it
-            db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, "backlog"))
-            db_session.commit()
-        # if the entry is already in the database
-        else:
-            flash("{} is already in your backlog under {}.".format(game, platform), "danger")
-            return redirect(url_for("backlog"))
-
-        flash("{} successfully added to your backlog under {}.".format(game, platform), "success")
-        return redirect(url_for("backlog"))
-    else:
-        backlog = db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id).order_by(ListEntry.game)
-        platforms = db_session.query(Platform.name).join(UserPlatform).filter(UserPlatform.user_id == current_user.id)
-
-        return render_template("backlog.html", entries=backlog, platforms=platforms)
+    return render_template("backlog.html", entries=entries, platforms=platforms)
 
 @app.route("/search")
 def search():
@@ -206,6 +177,43 @@ def search():
 
     # return the search results
     return jsonify(response)
+
+@app.route("/add/<string:list_type>", methods=["POST"])
+@login_required
+def add(list_type):
+    """
+    Route to handle adding games to various lists
+    """
+
+    # retrieve form data
+    platform = request.form.get("platform")
+    igdb_id = request.form.get("igdb_id")
+    game = request.form.get("game_name")
+    image_url = request.form.get("image_url")
+
+    # make sure none of the fields in the form were blank
+    if not all([platform, igdb_id, game, image_url]) or platform == "Platform":
+        flash("Game and/or platform missing, couldn't add to {}. Please try again.".format(list_type), "danger")
+        return redirect(url_for(list_type))
+
+    # get platform ID from database based on the value provided in the form
+    platform_id = db_session.query(Platform.id).filter(Platform.name == platform).one().id
+
+    # query the database and check if the entry the user is about to add
+    # already exists, in order to ensure the user doesn't add duplicates
+    if not db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id). \
+                                       filter(ListEntry.game == game). \
+                                       filter(ListEntry.platform_id == platform_id):
+        # if the entry doesn't exist in the database, insert it
+        db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, list_type))
+        db_session.commit()
+    # if the entry is already in the database
+    else:
+        flash("{} is already in your {} under {}.".format(game,list_type, platform), "danger")
+        return redirect(url_for(list_type))
+
+    flash("{} successfully added to your {} under {}.".format(game, list_type, platform), "success")
+    return redirect(url_for(list_type))
 
 @app.route("/delete", methods=["POST"])
 @login_required
