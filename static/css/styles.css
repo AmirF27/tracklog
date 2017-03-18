@@ -30,7 +30,7 @@ main {
 }
 
     .result-list .result-item img {
-        height: 60px;
+        width: 60px;
         vertical-align: middle;
     }
 

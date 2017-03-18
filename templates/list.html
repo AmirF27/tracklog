@@ -43,28 +43,41 @@
         </div>
     </div><!-- /.row -->
     {% if list_entries %}
+        <div class="panel-group" role="tablist" aria-multiselectable="true">
         {% for platform, entries in list_entries|dictsort %}
             {% if entries %}
-                <h3>{{ platform }}</h3>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="heading{{ loop.index }}">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" href="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                                {{ platform }}
+                            </a>
+                        </h4>
+                    </div><!-- /.panel-heading -->
+
+                    <div id="collapse{{ loop.index }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ loop.index }}">
+                        <ul class="list-group">
+                        {% for entry in entries %}
+                            <li class="list-group-item" data-game-id="{{ entry.igdb_id }}"">
+                                <div class="list-content-wrapper">
+                                <img src="{{ entry.image_url }}" alt="{{ entry.game }}">
+                                    {{ entry.game }}
+                                    <form action="{{ url_for('delete_game', list_type=list_type) }}" method="post">
+                                        <input type="hidden" name="entry_game" value="{{ entry.game }}">
+                                        <input type="hidden" name="entry_platform" value="{{ platform }}">
+                                        <button type="submit" class="btn btn-default" title="Delete from {{ list_type }}">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div><!-- /.panel-collapse -->
+                </div><!-- /.panel-default -->
             {% endif %}
-            <ul class="list-group">
-            {% for entry in entries %}
-                <li class="list-group-item" data-game-id="{{ entry.igdb_id }}"">
-                    <div class="list-content-wrapper">
-                    <img src="{{ entry.image_url }}" alt="{{ entry.game }}">
-                        {{ entry.game }}
-                        <form action="{{ url_for('delete_game', list_type=list_type) }}" method="post">
-                            <input type="hidden" name="entry_game" value="{{ entry.game }}">
-                            <input type="hidden" name="entry_platform" value="{{ platform }}">
-                            <button type="submit" class="btn btn-default" title="Delete from {{ list_type }}">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
-                            </button>
-                        </form>
-                    </div>
-                </li>
-            {% endfor %}
-            </ul>
         {% endfor %}
+        </div><!-- /.panel-group -->
     {% else %}
         <div class="alert alert-info text-center">Your {{ list_type }} is currently empty.</div>
     {% endif %}
