@@ -214,7 +214,7 @@ def add_game(list_type):
         return redirect(url_for("lists", list_type=list_type))
 
     # get platform ID from database based on the value provided in the form
-    platform_id = db_session.query(Platform.id).filter(Platform.name == platform).one().id
+    platform_id = db_session.query(Platform.id).filter(Platform.name == platform).first().id
 
     # query the database and check if the entry the user is about to add
     # already exists, in order to ensure the user doesn't add duplicates
@@ -225,7 +225,6 @@ def add_game(list_type):
         # if the entry doesn't exist in the database, insert it
         db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, list_type))
         db_session.commit()
-
     # if the entry is already in the database
     else:
         # redirect user to current list, displaying an error message
@@ -278,17 +277,70 @@ def delete_game(list_type):
 @app.route("/account-settings")
 @login_required
 def account_settings():
+    """
+    Route for fetching user's data and displaying their settings page
+    """
 
-    platforms = []
+    # query database for user's platforms
+    user_platforms = db_session.query(UserPlatform, Platform.name). \
+                                join(Platform). \
+                                filter(UserPlatform.user_id == current_user.id). \
+                                order_by(Platform.name). \
+                                with_entities(Platform.name). \
+                                all()
 
-    for platform in db_session.query(UserPlatform, Platform.name). \
-                           join(Platform). \
-                           filter(UserPlatform.user_id == current_user.id). \
+    # query database for all existing platforms
+    platforms = db_session.query(Platform.name). \
                            order_by(Platform.name). \
-                           all():
-        platforms.append(platform[1])
+                           all()
 
-    return render_template("account-settings.html", platforms=platforms)
+    return render_template("account-settings.html", user_platforms=user_platforms, platforms=platforms)
+
+@app.route("/add-platform", methods=["POST"])
+@login_required
+def add_platform():
+    """
+    Route for adding platforms
+    """
+
+    # retrieve the platform name to add and make sure it's not missing
+    platform_name = request.form.get("platform_name")
+    if not platform_name:
+        raise RuntimeError("missing parameter: platform_name")
+
+    # query database for requested platform, making sure to perform a case-insensitive
+    #  search (the user could have typed in all lower case, for instance)
+    platform = db_session.query(Platform). \
+                             filter(func.lower(Platform.name) == func.lower(platform_name)). \
+                             first()
+
+    # make sure the requested platform exists in the database
+    if not platform:
+        flash("You've entered an invalid platform name. Please try again.", "danger")
+        return redirect(url_for("account_settings"))
+
+    # get the platform ID and proper name from database
+    platform_id = platform.id
+    platform_name = platform.name
+
+    # query the database and check if the platform the user is about to add
+    # already exists, in order to ensure the user doesn't add duplicates
+    if not db_session.query(UserPlatform). \
+                      filter(UserPlatform.user_id == current_user.id). \
+                      filter(UserPlatform.platform_id == platform_id). \
+                      first():
+        # if the entry doesn't exist in the database, insert it
+        db_session.add(UserPlatform(current_user.id, platform_id))
+        db_session.commit()
+    # if the entry is already in the database
+    else:
+        # redirect user to current list, displaying an error message
+        flash("You already have {} in your platforms.".format(platform_name), "danger")
+        return redirect(url_for("account_settings"))
+
+    # redirect user to their settings page, displaying a success message
+    flash("{} successfully added to your platforms.".format(platform_name), "success")
+    return redirect(url_for("account_settings"))
 
 @app.route("/delete-platform", methods=["POST"])
 @login_required
@@ -305,9 +357,9 @@ def delete_platform():
     # query database for the ID of the platform to delete
     platform_id = db_session.query(UserPlatform.id). \
                              join(Platform). \
-                             filter(UserPlatform.id == current_user.id). \
+                             filter(UserPlatform.user_id == current_user.id). \
                              filter(Platform.name == platform_name). \
-                             first()[0]
+                             first().id
 
     # make sure the platform exists in the database
     if not platform_id:
@@ -319,7 +371,7 @@ def delete_platform():
     db_session.commit()
 
     # redirect user to their settings page, displaying a success message
-    flash("{} successfully deleted.".format(platform_name), "success")
+    flash("{} successfully deleted from your platforms.".format(platform_name), "success")
     return redirect(url_for("account_settings"))
 
 @login_manager.user_loader
