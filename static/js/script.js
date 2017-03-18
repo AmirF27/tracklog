@@ -1,9 +1,15 @@
 var removeIcon = " <i class='fa fa-times' aria-hidden='true'></i>";
-var timer;
+var searchTimer;
+var listTimer;
 var $searchInput;
 var $searchResults;
 
 $(function() {
+    // figure out on which page the user is, and set the 
+    // corresponding navigation link to be the active one
+    // http://totalprogus.blogspot.co.il/2013/12/bootstrap-add-active-class-to-li.html
+    $("a[href='" + document.location.pathname + "']").parent().addClass("active");
+
     // cache game search textbox and search results container div
     $searchInput = $("input[name='game_name']");
     $searchResults = $(".result-list");
@@ -13,8 +19,8 @@ $(function() {
         // set timeout in order to throttle number of requests
         // timeout idea attributed to following StackOverflow answer:
         // http://stackoverflow.com/a/13209287
-        clearTimeout(timer);
-        timer = setTimeout(function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
             // if search textbox is not empty
             if ($searchInput.val()) {
                 // search for games matching input and show list
@@ -28,6 +34,21 @@ $(function() {
                 $searchResults.hide();
             }
         }, 400);
+    });
+
+    // toggle between minus and plus signs as the user collapses/expands lists
+    $(".panel-title a").on("click", function() {
+        var title = this;
+        clearTimeout(listTimer);
+        // wait 300 milliseconds to sync in with the slide effect
+        listTimer = setTimeout(function() {
+            if ($(title).hasClass("collapsed")) {
+                $("i", title).removeClass("fa-minus-square-o").addClass("fa-plus-square-o");
+            }
+            else {
+                $("i", title).removeClass("fa-plus-square-o").addClass("fa-minus-square-o");
+            }
+        }, 300);
     });
 });
 

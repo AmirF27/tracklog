@@ -355,6 +355,7 @@ def add_platform():
 def delete_platform():
     """
     Route for deleting platforms
+    TODO: delete all games associated with platform
     """
 
     # retrieve the platform name to delete and make sure it's not missing
@@ -363,19 +364,23 @@ def delete_platform():
         raise RuntimeError("missing parameter: platform_name")
 
     # query database for the ID of the platform to delete
-    platform_id = db_session.query(UserPlatform.id). \
+    platform_id = db_session.query(UserPlatform.id, Platform.id). \
                              join(Platform). \
                              filter(UserPlatform.user_id == current_user.id). \
                              filter(Platform.name == platform_name). \
-                             first().id
+                             first()
 
     # make sure the platform exists in the database
-    if not platform_id:
+    if not platform_id[0]:
         flash("Uh oh, something went wrong.", "danger")
         return redirect(url_for("account_settings"))
 
+    # delete all games associated with platform
+    db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id). \
+                                filter(ListEntry.platform_id == platform_id[1]). \
+                                delete()
     # delete platform
-    db_session.query(UserPlatform).filter(UserPlatform.id == platform_id).delete()
+    db_session.query(UserPlatform).filter(UserPlatform.id == platform_id[0]).delete()
     db_session.commit()
 
     # redirect user to their settings page, displaying a success message

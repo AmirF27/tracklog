@@ -76,3 +76,15 @@ main {
 .platform-list li form {
     display: inline;
 }
+
+.panel-title .fa {
+    margin-right: 8px;
+}
+
+.panel-title .fa-minus-square-o {
+    color: #a94442;
+}
+
+.panel-title .fa-plus-square-o {
+    color: #3c763d;
+}
