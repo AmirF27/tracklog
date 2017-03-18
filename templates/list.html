@@ -12,11 +12,11 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 {{ message[1] }}
-            </div>
+            </div><!-- /.alert -->
         {% endif %}
     {% endwith %}
 
-    <form class="form-inline" action="{{ url_for('add', list_type=list_type) }}" method="post">
+    <form class="form-inline" action="{{ url_for('add_game', list_type=list_type) }}" method="post">
         <input type="hidden" name="igdb_id">
         <input type="hidden" name="image_url">
         <div class="form-group">
@@ -24,7 +24,7 @@
             <div class="panel panel-default form-control game-panel">
                 <div class="panel-body"></div>
             </div>
-        </div>
+        </div><!-- /.form-group -->
         <div class="form-group">
             <select class="form-control" name="platform" required>
                 <option>Platform</option>
@@ -34,25 +34,24 @@
                     {% endfor %}
                 {% endif %}
             </select>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary" type="submit">Add to {{ list_type }}</button>
-        </div>
+        </div><!-- /.form-group -->
+        <button class="btn btn-primary" type="submit">Add to {{ list_type }}</button>
     </form>
     <div class="row list-container">
         <div class="col-xs-12 col-sm-6 col-md-4">
             <ul class="list-group result-list"></ul>
         </div>
-    </div>
+    </div><!-- /.row -->
     {% if entries %}
         <ul class="list-group">
         {% for entry in entries %}
-            <li class="list-group-item" data-game-id="{{ entry.igdb_id }}" data-entry-id="{{ entry.id }}">
+            <li class="list-group-item" data-game-id="{{ entry[0].igdb_id }}"">
                 <div class="list-content-wrapper">
-                <img src="{{ entry.image_url }}" alt="{{ entry.game }}">
-                    {{ entry.game }}
-                    <form action="{{ url_for('delete', list_type=list_type) }}" method="post">
-                        <input type="hidden" name="id" value="{{ entry.id }}">
+                <img src="{{ entry[0].image_url }}" alt="{{ entry[0].game }}">
+                    {{ entry[0].game }}
+                    <form action="{{ url_for('delete_game', list_type=list_type) }}" method="post">
+                        <input type="hidden" name="entry_game" value="{{ entry[0].game }}">
+                        <input type="hidden" name="entry_platform" value="{{ entry[1] }}">
                         <button type="submit" class="btn btn-default">
                             <i class="fa fa-trash" aria-hidden="true"></i>
                         </button>

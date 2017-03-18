@@ -12,17 +12,24 @@ from database import db_session
 from helpers import *
 from flask_jsglue import JSGlue
 
+# configure app
 app = Flask(__name__)
 app.secret_key = 'some_secret'
 
+# configure login_manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.session_protection = "strong"
 
+# configure JSGlue
 JSGlue(app)
 
 @app.route("/")
 def index():
+    """
+    Route for rendering the home page
+    """
+
     return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
@@ -136,17 +143,22 @@ def lists(list_type):
     Route for displaying user backlog
     """
 
-    entries = db_session.query(ListEntry). \
+    # retrieve user's entries for current list (list_type)
+    entries = db_session.query(ListEntry, Platform.name). \
+                         join(Platform). \
                          filter(ListEntry.user_id == current_user.id). \
                          filter(ListEntry.list_type == list_type). \
                          order_by(ListEntry.game). \
                          all()
+
+    # retrieve user's platforms
     platforms = db_session.query(Platform.name). \
                            join(UserPlatform). \
                            filter(UserPlatform.user_id == current_user.id). \
                            order_by(Platform.name). \
                            all()
 
+    # render list (list_type) with user's entries and platforms
     return render_template("list.html", list_type=list_type, entries=entries, platforms=platforms)
 
 @app.route("/search")
@@ -183,9 +195,9 @@ def search():
     # return the search results
     return jsonify(response)
 
-@app.route("/add/<string:list_type>", methods=["POST"])
+@app.route("/add-game/<string:list_type>", methods=["POST"])
 @login_required
-def add(list_type):
+def add_game(list_type):
     """
     Route to handle adding games to various lists
     """
@@ -216,36 +228,51 @@ def add(list_type):
 
     # if the entry is already in the database
     else:
+        # redirect user to current list, displaying an error message
         flash("{} is already in your {} under {}.".format(game,list_type, platform), "danger")
         return redirect(url_for("lists", list_type=list_type))
 
+    # redirect user to current list, displaying a success message
     flash("{} successfully added to your {} under {}.".format(game, list_type, platform), "success")
     return redirect(url_for("lists", list_type=list_type))
 
-@app.route("/delete/<string:list_type>", methods=["POST"])
+@app.route("/delete-game/<string:list_type>", methods=["POST"])
 @login_required
-def delete(list_type):
+def delete_game(list_type):
     """
     Route for deleting list entries from database
     """
 
-    # retrieve the id of the entry to delete and make sure it's not missing
-    id = request.form.get("id")
-    if not id:
-        raise RuntimeError("missing parameter: id")
+    # retrieve the name of the game to delete and make sure it's not missing
+    entry_game = request.form.get("entry_game")
+    if not entry_game:
+        raise RuntimeError("missing parameter: entry_game")
 
-    # get the info to display to the user (which game was delete and under which platform it was)
-    info = db_session.query(ListEntry.game, Platform.name). \
-                      join(Platform). \
-                      filter(ListEntry.id == id).one()
-    info = { "game": info[0], "platform": info[1] }
+    # retrieve the platform of the game to delete and make sure it's not missing
+    entry_platform = request.form.get("entry_platform")
+    if not entry_platform:
+        raise RuntimeError("missing parameter: entry_platform")
+
+    # query database for the ID of the entry to delete
+    entry_id = db_session.query(ListEntry.id). \
+                          join(Platform). \
+                          filter(ListEntry.list_type == list_type). \
+                          filter(ListEntry.game == entry_game). \
+                          filter(Platform.name == entry_platform). \
+                          first()[0]
+
+    # make sure the entry exists in the database
+    if not entry_id:
+        flash("Uh oh, something went wrong.", "danger")
+        redirect(url_for("lists"), list_type=list_type)
 
     # delete the list entry
-    db_session.query(ListEntry).filter(ListEntry.id == id).delete()
+    db_session.query(ListEntry).filter(ListEntry.id == entry_id).delete()
     db_session.commit()
 
+    # redirect user to the current list, displaying a success message
     flash("{} under {} successfully deleted from your {}."
-        .format(info.get("game"), info.get("platform"), list_type), "success")
+        .format(entry_game, entry_platform, list_type), "success")
     return redirect(url_for("lists", list_type=list_type))
 
 @app.route("/account-settings")
@@ -262,6 +289,38 @@ def account_settings():
         platforms.append(platform[1])
 
     return render_template("account-settings.html", platforms=platforms)
+
+@app.route("/delete-platform", methods=["POST"])
+@login_required
+def delete_platform():
+    """
+    Route for deleting platforms
+    """
+
+    # retrieve the platform name to delete and make sure it's not missing
+    platform_name = request.form.get("platform_name")
+    if not platform_name:
+        raise RuntimeError("missing parameter: platform_name")
+
+    # query database for the ID of the platform to delete
+    platform_id = db_session.query(UserPlatform.id). \
+                             join(Platform). \
+                             filter(UserPlatform.id == current_user.id). \
+                             filter(Platform.name == platform_name). \
+                             first()[0]
+
+    # make sure the platform exists in the database
+    if not platform_id:
+        flash("Uh oh, something went wrong.", "danger")
+        return redirect(url_for("account_settings"))
+
+    # delete platform
+    db_session.query(UserPlatform).filter(UserPlatform.id == platform_id).delete()
+    db_session.commit()
+
+    # redirect user to their settings page, displaying a success message
+    flash("{} successfully deleted.".format(platform_name), "success")
+    return redirect(url_for("account_settings"))
 
 @login_manager.user_loader
 def load_user(user_id):

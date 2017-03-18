@@ -68,3 +68,11 @@ main {
     color: #a94442;
     font-size: 20px;
 }
+
+.platform-list li button {
+    margin-right: 8px;
+}
+
+.platform-list li form {
+    display: inline;
+}
