@@ -50,6 +50,27 @@ $(function() {
             }
         }, 300);
     });
+
+    // display modal to confirm game/platform deletion
+    $(".delete").on("click", function(event) {
+        // stop form submission
+        event.preventDefault();
+        var $form = $(this).closest("form");
+        // attempt to get game or platform name
+        var game = $("input[name='entry_game']").val();
+        var platform = $("input[name='platform_name']").val();
+        // show either the game or platform name in the modal body, 
+        // depending on context
+        $(".modal-body span").text(game || platform);
+        // display modal
+        $(".modal").modal({
+            keyboard: true
+        })
+        // submit form if user has confirmed
+        .on("click", "#confirm", function() {
+            $form.trigger("submit");
+        });
+    });
 });
 
 /*
