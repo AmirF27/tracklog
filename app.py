@@ -143,14 +143,6 @@ def lists(list_type):
     Route for displaying user backlog
     """
 
-    # retrieve user's entries for current list (list_type)
-    entries = db_session.query(ListEntry, Platform.name). \
-                         join(Platform). \
-                         filter(ListEntry.user_id == current_user.id). \
-                         filter(ListEntry.list_type == list_type). \
-                         order_by(ListEntry.game). \
-                         all()
-
     # retrieve user's platforms
     platforms = db_session.query(Platform.name). \
                            join(UserPlatform). \
@@ -158,8 +150,24 @@ def lists(list_type):
                            order_by(Platform.name). \
                            all()
 
+    # retrieve user's entries for current list (list_type)
+    entries = db_session.query(ListEntry, Platform.name). \
+                         join(Platform). \
+                         filter(ListEntry.user_id == current_user.id). \
+                         filter(ListEntry.list_type == list_type). \
+                         order_by(Platform.name, ListEntry.game). \
+                         all()
+
+    if entries:
+        # https://developmentality.wordpress.com/2012/03/30/three-ways-of-creating-dictionaries-in-python/
+        list_entries = dict([ (platform.name, []) for platform in platforms ])
+        for entry in entries:
+            list_entries[entry[1]].append(entry[0])
+    else:
+        list_entries = None
+
     # render list (list_type) with user's entries and platforms
-    return render_template("list.html", list_type=list_type, entries=entries, platforms=platforms)
+    return render_template("list.html", list_type=list_type, list_entries=list_entries, platforms=platforms)
 
 @app.route("/search")
 def search():
