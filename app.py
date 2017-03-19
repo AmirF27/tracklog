@@ -59,7 +59,7 @@ def login():
 
         # check if the entered password is correct
         if not pwd_context.verify(password, user.password):
-            flash("You've entered a wrong password!")
+            flash("You've entered a wrong password.")
             return render_template("login.html")
 
         # determine whether to remember user or not
@@ -114,19 +114,24 @@ def register():
         if not all([username, email, password, confirm]):
             flash("Username, email, password, and/or password confirmation missing. \
                 Please fill in all of the fields and try again.")
-            return render_template("register.html")
+            return redirect(url_for("register"))
 
         # make sure password and password confirmation match
         if password != confirm:
             flash("Password and password confirmation did not match.")
-            return render_template("register.html")
+            return redirect(url_for("register"))
 
         # create a user object, and encrypt their password
         user = User(username, email, pwd_context.encrypt(password))
 
-        # insert the user into the database
-        db_session.add(user)
-        db_session.commit();
+        # attempt to insert the user into the database
+        # if the username/email address already exist, notify user
+        if not db_session.add(user):
+            flash("The username and/or email address you've entered already exist.")
+            return redirect(url_for("register"))
+
+        # everything went well, add user to database
+        db_session.commit()
 
         # log the user in for convenience
         login_user(user, remember=False)
@@ -304,6 +309,67 @@ def account_settings():
 
     return render_template("account-settings.html", user_platforms=user_platforms, platforms=platforms)
 
+@app.route("/change-email", methods=["POST"])
+@login_required
+def change_email():
+    """
+    Route for changing email address
+    """
+
+    # retrieve password and email and make sure they're not missing
+    password = request.form.get("password")
+    email = request.form.get("email")
+    if not all([password, email]):
+        flash("Password and/or email address missing.", "danger")
+        return redirect(url_for("account_settings"))
+
+    # make sure the password the user has entered is correct
+    if not pwd_context.verify(password, current_user.password):
+        flash("You've entered a wrong password.", "danger")
+        return redirect(url_for("account_settings"))
+
+    # change the user's email address
+    User.query.get(current_user.id).email = email
+    db_session.commit()
+
+    # redirect the user to their settings page with a success message
+    flash("Email address successfully changed.", "success")
+    return redirect(url_for("account_settings"))
+
+@app.route("/change-password", methods=["POST"])
+@login_required
+def change_password():
+    """
+    Route for changing password
+    """
+
+    # retrieve current and new password and password confirmation 
+    # and make sure they're not missing
+    current_password = request.form.get("current_password")
+    new_password = request.form.get("new_password")
+    confirm_password = request.form.get("confirm_password")
+    if not all([current_password, new_password, confirm_password]):
+        flash("Current password, new password, and/or password confirmation missing", "danger")
+        return redirect(url_for("account_settings"))
+
+    # make sure the current password is correct
+    if not pwd_context.verify(current_password, current_user.password):
+        flash("You've entered a wrong current password.", "danger")
+        return redirect(url_for("account_settings"))
+
+    # make sure new password and new password confirmation match
+    if new_password != confirm_password:
+        flash("New password and new password confirmation did not match.", "danger")
+        return redirect(url_for("account_settings"))
+
+    # change the user's password
+    User.query.get(current_user.id).password = pwd_context.encrypt(new_password)
+    db_session.commit()
+
+    # redirect the user to their settings page with a success message
+    flash("Password successfully changed.", "success")
+    return redirect(url_for("account_settings"))
+
 @app.route("/add-platform", methods=["POST"])
 @login_required
 def add_platform():
@@ -317,7 +383,7 @@ def add_platform():
         raise RuntimeError("missing parameter: platform_name")
 
     # query database for requested platform, making sure to perform a case-insensitive
-    #  search (the user could have typed in all lower case, for instance)
+    # search (the user could have typed in all lower case, for instance)
     platform = db_session.query(Platform). \
                              filter(func.lower(Platform.name) == func.lower(platform_name)). \
                              first()
@@ -355,7 +421,6 @@ def add_platform():
 def delete_platform():
     """
     Route for deleting platforms
-    TODO: delete all games associated with platform
     """
 
     # retrieve the platform name to delete and make sure it's not missing

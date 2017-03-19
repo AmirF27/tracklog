@@ -14,6 +14,49 @@
     {% endwith %}
 
     <section>
+        
+        <h2 class="text-center">Manage Account</h2>
+
+        <div class="row">
+            
+            <div class="col-sm-6">
+                <h3>Account Information</h3>
+                <span><label class="label-block">Username:</label> {{ current_user.username }}</span>
+                <span><label class="label-block">Email address:</label> {{ current_user.email }}</span>
+
+                <h3>Change Email Address</h3>
+                <form action="{{ url_for('change_email') }}" method="post">
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="email" name="email" placeholder="New email address" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change email</button>
+                </form>
+            </div><!-- /.col-sm-6 -->
+
+            <div class="col-sm-6">
+                <h3>Change Password</h3>
+                <form action="{{ url_for('change_password') }}" method="post">
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="current_password" placeholder="Current password" required>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="new_password" placeholder="New password" required>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="confirm_password" placeholder="Confirm new password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change password</button>
+                </form>
+            </div><!-- /.col-sm-6 -->
+
+        </div><!-- /.row -->
+
+    </section>
+
+    <section>
 
         <h2 class="text-center">Manage Platforms</h2>
 
@@ -44,16 +87,16 @@
                 <h3>Add a Platform</h3>
                 <form class="form-inline" action="{{ url_for('add_platform') }}" method="post">
                     <div class="form-group">
-                        <input class="form-control" type="text" name="platform_name" list="platforms" required>
+                        <input class="form-control" type="text" name="platform_name" list="platforms" placeholder="Platform" required>
                         <datalist id="platforms">
                             {% for platform in platforms %}
                                 <option>{{ platform.name }}</option>
                             {% endfor %}
                         </datalist>
-                    </div>
+                    </div><!-- /.form-group -->
                     <button type="submit" class="btn btn-primary">Add Platform</button>
                 </form>
-            </div>
+            </div><!-- /.col-sm-6 -->
 
         </div><!-- /.row -->
 

@@ -109,3 +109,7 @@ main {
 .panel-title .fa-plus-square-o {
     color: #3c763d;
 }
+
+section span {
+    display: block;
+}
