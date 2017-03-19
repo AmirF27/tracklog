@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Tracklog: Register
+    Tracklog - Register
 {% endblock %}
 
 {% block main %}
@@ -16,7 +16,7 @@
         {% endif %}
     {% endwith %}
     
-    <form action="{{ url_for('register') }}" method="post">
+    <form class="form-center" action="{{ url_for('register') }}" method="post">
         <div class="form-group">
             <input class="form-control" type="text" name="username" placeholder="Username" required>
         </div>
@@ -29,6 +29,6 @@
         <div class="form-group">
             <input class="form-control" type="password" name="confirm" placeholder="Confirm password" required>
         </div>
-        <button class="btn btn-primary" type="submit">Register</button>
+        <button class="btn btn-primary btn-block" type="submit">Register</button>
     </form>
 {% endblock %}

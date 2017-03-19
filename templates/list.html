@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Tracklog: {{ current_user.username }}'s {{ list_type }}
+    Tracklog - {{ current_user.username }}'s {{ list_type|capitalize }}
 {% endblock %}
 
 {% block main %}
@@ -37,13 +37,9 @@
         </div><!-- /.form-group -->
         <button class="btn btn-primary" type="submit">Add to {{ list_type }}</button>
     </form>
-    <!-- <div class="">
-        <div class="row result-list-wrapper">
-            <div class="col-sm-6 col-md-4"> -->
-                <ul class="list-group result-list"></ul>
-            <!-- </div>
-        </div>
-    </div> -->
+
+    <ul class="list-group result-list"></ul>
+                
     {% if list_entries %}
         <div class="panel-group" role="tablist" aria-multiselectable="true">
         {% for platform, entries in list_entries|dictsort %}
@@ -67,7 +63,7 @@
                                     <form action="{{ url_for('delete_game', list_type=list_type) }}" method="post">
                                         <input type="hidden" name="entry_game" value="{{ entry.game }}">
                                         <input type="hidden" name="entry_platform" value="{{ platform }}">
-                                        <button type="submit" class="btn btn-default delete" title="Delete from {{ list_type }}">
+                                        <button type="submit" class="btn btn-default delete" data-toggle="tooltip" title="Delete from {{ list_type }}">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </button>
                                     </form>

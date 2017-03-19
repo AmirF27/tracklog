@@ -1,9 +1,10 @@
 main {
-    margin-top: 60px;
+    margin-top: 70px;
+    margin-bottom: 80px;
 }
 
 .form-inline {
-    margin-bottom: 8px;
+    margin-bottom: 20px;
 }
 
 .form-inline .game-panel {
@@ -15,20 +16,31 @@ main {
     padding: 0;
 }
 
-    .game-panel .fa-times:hover {
+    .game-panel .fa-times {
         cursor: pointer;
+        float: right;
+        line-height: 34px;
+        margin-left: 8px;
     }
 
 .result-list {
     display: none;
     position: absolute;
     max-width: 100%;
-    top: 100px;
+    top: 110px;
     z-index: 1;
     -webkit-box-shadow: 4px 4px 15px 0 rgba(0,0,0,0.75);
        -moz-box-shadow: 4px 4px 15px 0 rgba(0,0,0,0.75);
             box-shadow: 4px 4px 15px 0 rgba(0,0,0,0.75);
 }
+
+    .result-list:after {
+        position: absolute;
+        content: "";
+        bottom: -80px;
+        height: 80px;
+        width: 1px;
+    }
 
     .result-list .result-item img {
         width: 60px;
@@ -44,30 +56,6 @@ main {
         display: block;
         margin: 0 auto;
         max-width: 100%;
-    }
-
-    @media (max-width: 767px) {
-        .result-list {
-            width: calc(100% - 30px);
-        }
-    }
-
-    @media (min-width: 768px) {
-        .result-list {
-            width: 50%;
-        }
-    }
-
-    @media (min-width: 992px) {
-        .result-list {
-            width: 41.66%;
-        }
-    }
-
-    @media (min-width: 1200px) {
-        .result-list {
-            width: 33.33%;
-        }
     }
 
 .list-content-wrapper {
@@ -112,4 +100,57 @@ main {
 
 section span {
     display: block;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #222;
+    color: #9d9d9d;
+    text-align: center;
+    padding-top: 15px;
+    z-index: 2;
+}
+
+@media (max-width: 767px) {
+    .result-list {
+        width: calc(100% - 30px);
+    }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+    .form-center button {
+        margin: 0 auto;
+        width: 50%;
+    }
+}
+
+@media (min-width: 768px) {
+    .form-center {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    .form-center button {
+        width: 30%;
+    }
+
+    .result-list {
+        width: 50%;
+    }
+}
+
+@media (min-width: 992px) {
+    .result-list {
+        width: 41.66%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .result-list {
+        width: 33.33%;
+    }
 }

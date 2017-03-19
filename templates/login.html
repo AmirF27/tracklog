@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Tracklog: Login
+    Tracklog - Login
 {% endblock %}
 
 {% block main %}
@@ -17,7 +17,7 @@
         {% endif %}
     {% endwith %}
 
-    <form action="{{ url_for('login') }}" method="post">
+    <form class="form-center" action="{{ url_for('login') }}" method="post">
         <div class="form-group">
             <input class="form-control" type="text" name="username" placeholder="Username" required>
         </div>
@@ -27,6 +27,6 @@
         <div class="checkbox">
             <label><input type="checkbox" name="remember"> Remember me</label>
         </div>
-        <button class="btn btn-primary" type="submit">Login</button>
+        <button class="btn btn-primary btn-block" type="submit">Login</button>
     </form>
 {% endblock %}

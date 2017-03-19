@@ -83,6 +83,14 @@ $(function() {
             $form.trigger("submit");
         });
     });
+
+    // initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip({
+        delay: {
+            "show": 500
+        },
+        placement: "bottom"
+    });
 });
 
 /*
