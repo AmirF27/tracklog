@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block main %}
+
+    <!-- FLASHED MESSAGES -->
+
     {% with message = get_flashed_messages(with_categories=True)[0] %}
         {% if message %}
             <div class="alert alert-{{ message[0] }} aler-dismissable fade in" role="alert">
@@ -15,6 +18,8 @@
             </div><!-- /.alert -->
         {% endif %}
     {% endwith %}
+
+    <!-- ADD GAME SECTION -->
 
     <form class="form-inline" action="{{ url_for('add_game', list_type=list_type) }}" method="post">
         <input type="hidden" name="igdb_id">
@@ -39,6 +44,8 @@
     </form>
 
     <ul class="list-group result-list"></ul>
+
+    <!-- LIST SECTION -->
                 
     {% if list_entries %}
         <div class="panel-group" role="tablist" aria-multiselectable="true">
@@ -79,6 +86,8 @@
     {% else %}
         <div class="alert alert-info text-center">Your {{ list_type }} is currently empty.</div>
     {% endif %}
+
+    <!-- GAME DELETION CONFIRMATION MODAL -->
 
     <div class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">

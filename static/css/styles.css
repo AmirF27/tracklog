@@ -1,27 +1,109 @@
+/*
+ * GENERAL STYLES
+ * --------------
+ */
+
 main {
     margin-top: 70px;
     margin-bottom: 80px;
 }
 
+/* Styles for delete buttons */
+.fa-trash {
+    display: block;
+    color: #a94442;
+    font-size: 20px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #222;
+    color: #9d9d9d;
+    text-align: center;
+    padding-top: 15px;
+    z-index: 2;
+}
+
+/*
+ * ACCOUNT SETTINGS PAGE STYLES
+ * ----------------------------
+ */
+
+section span {
+    display: block;
+}
+
+.platform-list li button {
+    margin-right: 8px;
+}
+
+.platform-list li form {
+    display: inline;
+}
+
+/*
+ * LIST PAGES STYLES
+ * -----------------
+ */
+
 .form-inline {
     margin-bottom: 20px;
 }
+
+    .form-inline .form-control {
+        min-width: 200px;
+    }
 
 .form-inline .game-panel {
     margin-bottom: 0;
     display: none;
 }
 
-.game-panel .panel-body {
-    padding: 0;
-}
+    .game-panel .panel-body {
+        padding: 0;
+    }
 
     .game-panel .fa-times {
         cursor: pointer;
         float: right;
-        line-height: 34px;
+        line-height: 20px;
         margin-left: 8px;
     }
+
+.panel-title .fa {
+    margin-right: 8px;
+}
+
+.panel-title .fa-minus-square-o {
+    color: #a94442;
+}
+
+.panel-title .fa-plus-square-o {
+    color: #3c763d;
+}
+
+.list-content-wrapper {
+    clear: both;    
+    display: inline-block;
+}
+
+    .list-content-wrapper img {
+        float: left;
+        margin-right: 8px;
+    }
+
+    .list-content-wrapper form {
+        margin-top: 10px;
+    }
+
+/*
+ * SEARCH RESULT LIST STYLES
+ * -------------------------
+ */
 
 .result-list {
     display: none;
@@ -34,6 +116,8 @@ main {
             box-shadow: 4px 4px 15px 0 rgba(0,0,0,0.75);
 }
 
+    /* Keep space between result list and bottom of page */
+    /* http://stackoverflow.com/a/17388710 */
     .result-list:after {
         position: absolute;
         content: "";
@@ -58,62 +142,10 @@ main {
         max-width: 100%;
     }
 
-.list-content-wrapper {
-    clear: both;    
-    display: inline-block;
-}
-
-.list-content-wrapper img {
-    float: left;
-    margin-right: 8px;
-}
-
-.list-content-wrapper form {
-    margin-top: 10px;
-}
-
-.fa-trash {
-    display: block;
-    color: #a94442;
-    font-size: 20px;
-}
-
-.platform-list li button {
-    margin-right: 8px;
-}
-
-.platform-list li form {
-    display: inline;
-}
-
-.panel-title .fa {
-    margin-right: 8px;
-}
-
-.panel-title .fa-minus-square-o {
-    color: #a94442;
-}
-
-.panel-title .fa-plus-square-o {
-    color: #3c763d;
-}
-
-section span {
-    display: block;
-}
-
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    background-color: #222;
-    color: #9d9d9d;
-    text-align: center;
-    padding-top: 15px;
-    z-index: 2;
-}
+/*
+ * MEDIA QUERIES
+ * -------------
+ */
 
 @media (max-width: 767px) {
     .result-list {

@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block main %}
+
+    <!-- FLASHED MESSAGES -->
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="alert alert-danger alert-dismissable" role="alert">
@@ -15,6 +18,8 @@
             </div>
         {% endif %}
     {% endwith %}
+
+    <!-- REGISTRATION FORM -->
     
     <form class="form-center" action="{{ url_for('register') }}" method="post">
         <div class="form-group">

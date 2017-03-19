@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block main %}
+    
+    <!-- FLASHED MESSAGES -->
+
     <!-- http://flask.pocoo.org/docs/0.12/patterns/flashing/ -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -16,6 +19,8 @@
             </div>
         {% endif %}
     {% endwith %}
+
+    <!-- LOGIN FORM -->
 
     <form class="form-center" action="{{ url_for('login') }}" method="post">
         <div class="form-group">
