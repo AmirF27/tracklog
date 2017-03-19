@@ -37,11 +37,13 @@
         </div><!-- /.form-group -->
         <button class="btn btn-primary" type="submit">Add to {{ list_type }}</button>
     </form>
-    <div class="row list-container">
-        <div class="col-xs-12 col-sm-6 col-md-4">
-            <ul class="list-group result-list"></ul>
+    <!-- <div class="">
+        <div class="row result-list-wrapper">
+            <div class="col-sm-6 col-md-4"> -->
+                <ul class="list-group result-list"></ul>
+            <!-- </div>
         </div>
-    </div><!-- /.row -->
+    </div> -->
     {% if list_entries %}
         <div class="panel-group" role="tablist" aria-multiselectable="true">
         {% for platform, entries in list_entries|dictsort %}

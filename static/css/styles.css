@@ -22,7 +22,8 @@ main {
 .result-list {
     display: none;
     position: absolute;
-    width: 100%;
+    max-width: 100%;
+    top: 100px;
     z-index: 1;
     -webkit-box-shadow: 4px 4px 15px 0 rgba(0,0,0,0.75);
        -moz-box-shadow: 4px 4px 15px 0 rgba(0,0,0,0.75);
@@ -42,11 +43,31 @@ main {
     .loading {
         display: block;
         margin: 0 auto;
+        max-width: 100%;
     }
 
-    /* prevent search results from going off screen */
-    .list-container {
-        margin-right: 15px;
+    @media (max-width: 767px) {
+        .result-list {
+            width: calc(100% - 30px);
+        }
+    }
+
+    @media (min-width: 768px) {
+        .result-list {
+            width: 50%;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .result-list {
+            width: 41.66%;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .result-list {
+            width: 33.33%;
+        }
     }
 
 .list-content-wrapper {

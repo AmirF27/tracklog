@@ -30,10 +30,22 @@ $(function() {
             // otherwise, if search textbox is empty
             else {
                 // clear the list and hide it
-                $searchResults.html("");
-                $searchResults.hide();
+                closeResultList();
             }
         }, 400);
+    });
+
+    // close search result list when user clicks outside
+    // http://stackoverflow.com/a/7385673
+    $(document).mouseup(function(event) {
+        event.stopPropagation();
+        var $resultItem = $(".result-item");
+        if (!$resultItem.is(event.target) 
+            && $resultItem.has(event.target).length === 0 
+            && !$(".form-control").is(event.target)) {
+            closeResultList();
+            $("input[name='game_name']").val("");
+        }
     });
 
     // toggle between minus and plus signs as the user collapses/expands lists
@@ -116,6 +128,9 @@ function search(query) {
     });
 }
 
+/**
+ * Displays a loading icon while waiting for response from server.
+ */
 function showLoadingIcon() {
     $searchResults.html($("<li/>", {
         class: "list-group-item",
@@ -149,26 +164,25 @@ function createListItem(game) {
 
     // some game covers were missing from API, so had to check
     // if it's missing in order to display a placeholder instead
-    var img = {};
+    var img;
     if (game.cover) {
-        img.src = game.cover.url;
+        img = game.cover.url;
     }
     else {
-        img.src = "https://placeholdit.imgix.net/~text?txtsize=22&txt=Missing%20cover&w=90&h=90";
+        img = "https://placeholdit.imgix.net/~text?txtsize=22&txt=Missing%20cover&w=90&h=90";
     }
-    img.alt = game.name;
 
+    // create a wrapper for list content and append game data to it
     var wrapper = $("<div/>", {
         class: "list-content-wrapper"
     });
-
     $("<img/>", {
-        src: img.src,
-        alt: img.alt
+        src: img,
+        alt: game.name
     }).appendTo(wrapper);
-
     wrapper.append(game.name);
 
+    // append wrapper with game data to the created list item
     wrapper.appendTo(listItem);
 
     return listItem;
@@ -181,8 +195,8 @@ function createListItem(game) {
  * @param {Object} game - Selected game to display.
  */
 function setGameSelection(game) {
-    // clear the result list and hide it, since it's not needed anymore
-    $searchResults.html("").hide();
+    // close the search result list, since it's not needed anymore
+    closeResultList();
 
     // set the value of search textbox to the name of the selected game
     // and hide it, will be used later for form submission (but the user doesn't need to see it)
@@ -217,4 +231,12 @@ function clearGameSelection() {
     // clear the hidden fields
     $("input[name='igdb_id']").val("");
     $("input[name='image_url']").val("");
+}
+
+/**
+ * Closes the search result list.
+ */
+function closeResultList() {
+    // clear the result list and hide it
+    $searchResults.html("").hide();
 }
