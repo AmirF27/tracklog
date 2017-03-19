@@ -161,9 +161,10 @@ section span {
 }
 
 @media (min-width: 768px) {
-    .form-center {
+    .form-center, .alert {
         width: 50%;
-        margin: 0 auto;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .form-center button {

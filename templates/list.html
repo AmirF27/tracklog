@@ -21,9 +21,9 @@
 
     <!-- ADD GAME SECTION -->
 
-    <form class="form-inline" action="{{ url_for('add_game', list_type=list_type) }}" method="post">
-        <input type="hidden" name="igdb_id">
-        <input type="hidden" name="image_url">
+    <form class="form-inline" id="game-form" action="{{ url_for('add_game', list_type=list_type) }}" method="post">
+        <input type="hidden" name="igdb_id" required>
+        <input type="hidden" name="image_url" required>
         <div class="form-group">
             <input class="form-control" type="text" name="game_name" placeholder="Game name" required>
             <div class="panel panel-default form-control game-panel">
@@ -47,10 +47,10 @@
 
     <!-- LIST SECTION -->
                 
-    {% if list_entries %}
+    {% if games %}
         <div class="panel-group" role="tablist" aria-multiselectable="true">
-        {% for platform, entries in list_entries|dictsort %}
-            {% if entries %}
+        {% for platform, games in games|dictsort %}
+            {% if games %}
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="heading{{ loop.index }}">
                         <h4 class="panel-title">
@@ -62,14 +62,14 @@
 
                     <div id="collapse{{ loop.index }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ loop.index }}">
                         <ul class="list-group">
-                        {% for entry in entries %}
-                            <li class="list-group-item" data-game-id="{{ entry.igdb_id }}"">
+                        {% for game in games %}
+                            <li class="list-group-item" data-game-id="{{ game.igdb_id }}"">
                                 <div class="list-content-wrapper">
-                                    <img src="{{ entry.image_url }}" alt="{{ entry.game }}">
-                                    {{ entry.game }}
+                                    <img src="{{ game.image_url }}" alt="{{ game.name }}">
+                                    {{ game.name }}
                                     <form action="{{ url_for('delete_game', list_type=list_type) }}" method="post">
-                                        <input type="hidden" name="entry_game" value="{{ entry.game }}">
-                                        <input type="hidden" name="entry_platform" value="{{ platform }}">
+                                        <input type="hidden" name="igdb_id" value="{{ game.igdb_id }}">
+                                        <input type="hidden" name="platform" value="{{ platform }}">
                                         <button type="submit" class="btn btn-default delete" data-toggle="tooltip" title="Delete from {{ list_type }}">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </button>

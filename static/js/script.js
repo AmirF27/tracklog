@@ -42,7 +42,8 @@ $(function() {
         var $resultItem = $(".result-item");
         if (!$resultItem.is(event.target) 
             && $resultItem.has(event.target).length === 0 
-            && !$(".form-control").is(event.target)) {
+            && !$(".form-control").is(event.target)
+            && !$(".game-form [type='submit']")) {
             closeResultList();
             $("input[name='game_name']").val("");
         }

@@ -37,20 +37,28 @@ class UserPlatform(Base):
 		self.user_id = user_id
 		self.platform_id = platform_id
 
+class Game(Base):
+	__tablename__ = "games"
+	id = Column(Integer, primary_key=True)
+	igdb_id = Column(Integer, nullable=False)
+	name = Column(String, nullable=False)
+	image_url = Column(String, nullable=False)
+
+	def __init__(self, igdb_id, name, image_url):
+		self.igdb_id = igdb_id
+		self.name = name
+		self.image_url = image_url
+
 class ListEntry(Base):
 	__tablename__ = "list_entries"
 	id = Column(Integer, primary_key=True)
 	user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+	game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
 	platform_id = Column(Integer, ForeignKey("platforms.id"), nullable=False)
-	igdb_id = Column(Integer, nullable=False)
-	game = Column(String, nullable=False)
-	image_url = Column(String, nullable=False)
 	list_type = Column(String, nullable=False)
 
-	def __init__(self, user_id, platform_id, igdb_id, game, image_url, list_type):
+	def __init__(self, user_id, game_id, platform_id, list_type):
 		self.user_id = user_id
+		self.game_id = game_id
 		self.platform_id = platform_id
-		self.igdb_id = igdb_id
-		self.game = game
-		self.image_url = image_url
 		self.list_type = list_type

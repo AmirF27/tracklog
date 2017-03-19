@@ -14,7 +14,7 @@ from flask_jsglue import JSGlue
 
 # configure app
 app = Flask(__name__)
-app.secret_key = 'some_secret'
+app.secret_key = os.environ.get("SECRET_KEY")
 
 # configure login_manager
 login_manager = LoginManager()
@@ -156,23 +156,25 @@ def lists(list_type):
                            all()
 
     # retrieve user's entries for current list (list_type)
-    entries = db_session.query(ListEntry, Platform.name). \
+    entries = db_session.query(ListEntry, Game, Platform.name). \
+                         join(Game). \
                          join(Platform). \
                          filter(ListEntry.user_id == current_user.id). \
                          filter(ListEntry.list_type == list_type). \
-                         order_by(Platform.name, ListEntry.game). \
+                         order_by(Platform.name, Game.name). \
                          all()
 
+    # if the user's current list (list_type) is not emptry
     if entries:
         # https://developmentality.wordpress.com/2012/03/30/three-ways-of-creating-dictionaries-in-python/
-        list_entries = dict([ (platform.name, []) for platform in platforms ])
+        games = dict([ (platform.name, []) for platform in platforms ])
         for entry in entries:
-            list_entries[entry[1]].append(entry[0])
+            games[entry[2]].append(entry[1])
     else:
-        list_entries = None
+        games = None
 
     # render list (list_type) with user's entries and platforms
-    return render_template("list.html", list_type=list_type, list_entries=list_entries, platforms=platforms)
+    return render_template("list.html", list_type=list_type, games=games, platforms=platforms)
 
 @app.route("/search")
 def search():
@@ -218,34 +220,43 @@ def add_game(list_type):
     # retrieve form data
     platform = request.form.get("platform")
     igdb_id = request.form.get("igdb_id")
-    game = request.form.get("game_name")
+    game_name = request.form.get("game_name")
     image_url = request.form.get("image_url")
 
     # make sure none of the fields in the form were blank
-    if not all([platform, igdb_id, game, image_url]) or platform == "Platform":
-        flash("Game and/or platform missing, couldn't add to {}. Please try again.".format(list_type), "danger")
+    if not all([platform, igdb_id]) or platform == "Platform":
+        flash("Game and/or platform missing, couldn't add to your {}. Please try again.".format(list_type), "danger")
         return redirect(url_for("lists", list_type=list_type))
 
     # get platform ID from database based on the value provided in the form
-    platform_id = db_session.query(Platform.id).filter(Platform.name == platform).first().id
+    platform_id = db_session.query(Platform).filter(Platform.name == platform).first().id
+
+    # query database for requested game
+    game = db_session.query(Game).filter(Game.igdb_id == igdb_id).first()
+
+    # if the game doesn't exist in the database, insert it
+    if not game:
+        game = Game(igdb_id, game_name, image_url)
+        db_session.add(game)
+        db_session.commit()
 
     # query the database and check if the entry the user is about to add
     # already exists, in order to ensure the user doesn't add duplicates
     if not db_session.query(ListEntry).filter(ListEntry.user_id == current_user.id). \
-                                       filter(ListEntry.game == game). \
+                                       filter(ListEntry.game_id == game.id). \
                                        filter(ListEntry.platform_id == platform_id). \
                                        first():
         # if the entry doesn't exist in the database, insert it
-        db_session.add(ListEntry(current_user.id, platform_id, igdb_id, game, image_url, list_type))
+        db_session.add(ListEntry(current_user.id, game.id, platform_id, list_type))
         db_session.commit()
     # if the entry is already in the database
     else:
         # redirect user to current list, displaying an error message
-        flash("{} is already in your {} under {}.".format(game,list_type, platform), "danger")
+        flash("{} is already in your {} under {}.".format(game.name,list_type, platform), "danger")
         return redirect(url_for("lists", list_type=list_type))
 
     # redirect user to current list, displaying a success message
-    flash("{} successfully added to your {} under {}.".format(game, list_type, platform), "success")
+    flash("{} successfully added to your {} under {}.".format(game.name, list_type, platform), "success")
     return redirect(url_for("lists", list_type=list_type))
 
 @app.route("/delete-game/<string:list_type>", methods=["POST"])
@@ -256,35 +267,37 @@ def delete_game(list_type):
     """
 
     # retrieve the name of the game to delete and make sure it's not missing
-    entry_game = request.form.get("entry_game")
-    if not entry_game:
-        raise RuntimeError("missing parameter: entry_game")
+    igdb_id = request.form.get("igdb_id")
+    if not igdb_id:
+        raise RuntimeError("missing parameter: igdb_id")
 
     # retrieve the platform of the game to delete and make sure it's not missing
-    entry_platform = request.form.get("entry_platform")
-    if not entry_platform:
-        raise RuntimeError("missing parameter: entry_platform")
+    platform = request.form.get("platform")
+    if not platform:
+        raise RuntimeError("missing parameter: platform")
 
-    # query database for the ID of the entry to delete
-    entry_id = db_session.query(ListEntry.id). \
+    # query database for the ID of the entry to delete, as well as 
+    # the associated game name
+    entry = db_session.query(ListEntry.id, Game.name). \
+                          join(Game). \
                           join(Platform). \
                           filter(ListEntry.list_type == list_type). \
-                          filter(ListEntry.game == entry_game). \
-                          filter(Platform.name == entry_platform). \
-                          first()[0]
+                          filter(Game.igdb_id == igdb_id). \
+                          filter(Platform.name == platform). \
+                          first()
 
     # make sure the entry exists in the database
-    if not entry_id:
+    if not entry.id:
         flash("Uh oh, something went wrong.", "danger")
         redirect(url_for("lists"), list_type=list_type)
 
     # delete the list entry
-    db_session.query(ListEntry).filter(ListEntry.id == entry_id).delete()
+    db_session.query(ListEntry).filter(ListEntry.id == entry.id).delete()
     db_session.commit()
 
     # redirect user to the current list, displaying a success message
     flash("{} under {} successfully deleted from your {}."
-        .format(entry_game, entry_platform, list_type), "success")
+        .format(entry.name, platform, list_type), "success")
     return redirect(url_for("lists", list_type=list_type))
 
 @app.route("/account-settings")
