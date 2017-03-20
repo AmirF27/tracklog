@@ -12,8 +12,6 @@ from database import db_session
 from helpers import *
 from flask_jsglue import JSGlue
 
-import traceback
-
 # configure app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
