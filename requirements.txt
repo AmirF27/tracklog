@@ -1,6 +1,5 @@
-Flask==0.10.1
-Flask_JSGlue==0.3.1
-Flask_Login==0.2.6
-passlib==1.6.5
-SQLAlchemy==1.1.6
-Unirest==1.1.7
+appdirs==1.4.3
+packaging==16.8
+pyparsing==2.2.0
+six==1.10.0
+gunicorn
