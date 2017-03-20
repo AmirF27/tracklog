@@ -5,7 +5,7 @@ import urllib
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, current_user
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from passlib.apps import custom_app_context as pwd_context
 from models import *
 from database import db_session
@@ -121,16 +121,16 @@ def register():
             flash("Password and password confirmation did not match.")
             return redirect(url_for("register"))
 
-        # create a user object, and encrypt their password
-        user = User(username, email, pwd_context.encrypt(password))
-
-        # attempt to insert the user into the database
-        # if the username/email address already exist, notify user
-        if not db_session.add(user):
+        # query database to check whether username/email already exist
+        if db_session.query(User). \
+                      filter(or_(User.username == username, User.email == email)). \
+                      first():
             flash("The username and/or email address you've entered already exist.")
             return redirect(url_for("register"))
 
         # everything went well, add user to database
+        user = User(username, email, pwd_context.encrypt(password))
+        db_session.add(user)
         db_session.commit()
 
         # log the user in for convenience
