@@ -43,7 +43,7 @@ $(function() {
         if (!$resultItem.is(event.target) 
             && $resultItem.has(event.target).length === 0 
             && !$(".form-control").is(event.target)
-            && !$(".game-form [type='submit']")) {
+            && !$("#game-form [type='submit']").is(event.target)) {
             closeResultList();
             $("input[name='game_name']").val("");
         }
@@ -110,13 +110,13 @@ function search(query) {
         // variable to hold list items for search results
         var results = [];
         // if no results were found, create a single list item displaying to the user as much
-        if (data.length === 0) {
+        if (data.results.length === 0) {
             results.push(createListItem(undefined));
         }
         // otherwise, for each result received from server,
         // create a list item and add it to results
         else {
-            data.forEach(function(game) {
+            data.results.forEach(function(game) {
                 results.push(createListItem(game));
             });
         }
@@ -125,7 +125,7 @@ function search(query) {
         $searchResults.html(results);
 
         // add a click listener to list items provided results were found
-        if (data.length !== 0) {
+        if (data.results.length !== 0) {
             $(".result-list li").on("click", function() {
                 setGameSelection({
                     id: $(this).data("game-id"),

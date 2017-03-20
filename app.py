@@ -185,35 +185,32 @@ def search():
     IGDB: https://www.igdb.com/
     """
 
-    try:
-        # retrieve search query from request and make sure it's not missing
-        q = request.args.get("q")
-        if not q:
-            raise RuntimeError("missing parameter: q")
+    # retrieve search query from request and make sure it's not missing
+    q = request.args.get("q")
+    if not q:
+        raise RuntimeError("missing parameter: q")
 
-        # retrieve the API key from the environment variables and make sure it's not missing
-        api_key = os.environ.get("API_KEY")
-        if not api_key:
-            raise RuntimeError("API_KEY not set")
+    # retrieve the API key from the environment variables and make sure it's not missing
+    api_key = os.environ.get("API_KEY")
+    if not api_key:
+        raise RuntimeError("API_KEY not set")
 
-        # search API for matching games
-        # http://unirest.io/python.html
-        response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/",
-            headers={ 
-                "X-Mashape-Key": api_key,
-                "Accept": "application/json"
-            }, 
-            params={ 
-                "fields": "name,cover",
-                "limit": 10,
-                "search": q
-            }
-        ).body
+    # search API for matching games
+    # http://unirest.io/python.html
+    response = unirest.get("https://igdbcom-internet-game-database-v1.p.mashape.com/games/",
+        headers={ 
+            "X-Mashape-Key": api_key,
+            "Accept": "application/json"
+        }, 
+        params={ 
+            "fields": "name,cover",
+            "limit": 10,
+            "search": q
+        }
+    ).body
 
-        # return the search results
-        return jsonify(response)
-    except Exception:
-        return traceback.format_exc()
+    # return the search results
+    return jsonify(results=response)
 
 @app.route("/add-game/<string:list_type>", methods=["POST"])
 @login_required
