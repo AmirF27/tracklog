@@ -8,6 +8,10 @@ main {
     margin-bottom: 80px;
 }
 
+p {
+    line-height: 1.5em;
+}
+
 /* Styles for delete buttons */
 .fa-trash {
     display: block;

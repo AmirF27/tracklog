@@ -1,0 +1,6 @@
+Flask==0.10.1
+Flask_JSGlue==0.3.1
+Flask_Login==0.2.6
+passlib==1.6.5
+SQLAlchemy==1.1.6
+Unirest==1.1.7

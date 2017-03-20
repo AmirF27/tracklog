@@ -10,16 +10,20 @@
 {% block main %}
     <h1>Welcome to Tracklog!</h1>
 
-    <p>
-        Tracklog is an application created to help gamers keep track of their video game backlog. It also provides them with a wishlist to keep everything in one place.
-    </p>
-    <p>
-    	To begin, <a href="{{ url_for('register') }}">create an account</a> and log in. Then visit your <a href="{{ url_for('account_settings') }}">account settings</a> page, where you can add platforms. You will need to add some platforms before you can start adding games to your lists. Under the "Manage Platforms" section on the account settings page, you will find a list of your current platforms, as well as a to add platforms. Choose a platform from the dropdown menu (or type it in) and click "Add Platform" to add the the desired platform to your list of platforms.
-    </p>
-    <p>
-    	After that, you can either check out the <a href="{{ url_for('lists', list_type='backlog') }}">backlog</a> or the <a href="{{ url_for('lists', list_type='wishlist') }}">wishlist</a> page, where you can view the video games you currently have in each list. To add a game, simply go to the desired list, type in the name of the game in the form at the top of the page, then click on the game from the suggestions. Then, choose one of your platforms to add the game under, and click the "Add" button. If you have selected a game but would like to change your selection, click on the X next to the game's name.
-    </p>
-    <p>
-    	Enjoy your stay!
-    </p>
+    <div class="row">
+        <div class="col-sm-10">
+            <p>
+                Tracklog is an application created to help gamers keep track of their video game backlog. It also provides them with a wishlist to keep everything in one place.
+            </p>
+            <p>
+                To begin, <a href="{{ url_for('register') }}">create an account</a> and log in. Then visit your <a href="{{ url_for('account_settings') }}">account settings</a> page, where you can add platforms. You will need to add some platforms before you can start adding games to your lists. Under the "Manage Platforms" section on the account settings page, you will find a list of your current platforms, as well as a to add platforms. Choose a platform from the dropdown menu (or type it in) and click "Add Platform" to add the the desired platform to your list of platforms.
+            </p>
+            <p>
+                After that, you can either check out the <a href="{{ url_for('lists', list_type='backlog') }}">backlog</a> or the <a href="{{ url_for('lists', list_type='wishlist') }}">wishlist</a> page, where you can view the video games you currently have in each list. To add a game, simply go to the desired list, type in the name of the game in the form at the top of the page, then click on the game from the suggestions. Then, choose one of your platforms to add the game under, and click the "Add" button. If you have selected a game but would like to change your selection, click on the X next to the game's name.
+            </p>
+            <p>
+                Enjoy your stay!
+            </p>
+        </div>
+    </div>
 {% endblock %}
