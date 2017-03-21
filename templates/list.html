@@ -33,6 +33,7 @@
         <div class="form-group">
             <select class="form-control" name="platform" required>
                 <option>Platform</option>
+                <option disabled></option>
                 {% if platforms %}
                     {% for platform in platforms %}
                         <option>{{ platform.name }}</option>

@@ -97,12 +97,13 @@
                 <h3>Add a Platform</h3>
                 <form class="form-inline" action="{{ url_for('add_platform') }}" method="post">
                     <div class="form-group">
-                        <input class="form-control" type="text" name="platform_name" list="platforms" placeholder="Platform" required>
-                        <datalist id="platforms">
+                        <select class="form-control" name="platform_name">
+                            <option>Platform</option>
+                            <option disabled></option>
                             {% for platform in platforms %}
                                 <option>{{ platform.name }}</option>
                             {% endfor %}
-                        </datalist>
+                        </select>
                     </div><!-- /.form-group -->
                     <button type="submit" class="btn btn-primary">Add Platform</button>
                 </form>
