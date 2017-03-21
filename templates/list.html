@@ -67,7 +67,7 @@
                             <li class="list-group-item" data-game-id="{{ game.igdb_id }}"">
                                 <div class="list-content-wrapper">
                                     <img src="{{ game.image_url }}" alt="{{ game.name }}">
-                                    {{ game.name }}
+                                    <span id="game-name">{{ game.name }}</span>
                                     <form action="{{ url_for('delete_game', list_type=list_type) }}" method="post">
                                         <input type="hidden" name="igdb_id" value="{{ game.igdb_id }}">
                                         <input type="hidden" name="platform" value="{{ platform }}">

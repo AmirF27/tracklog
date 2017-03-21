@@ -70,7 +70,7 @@ $(function() {
         event.preventDefault();
         var $form = $(this).closest("form");
         // attempt to get game or platform name
-        var game = $("input[name='entry_game']").val();
+        var game = $("#game-name").text();
         var platform = $("input[name='platform_name']").val();
         // show either the game or platform name in the modal body, 
         // depending on context
